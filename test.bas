@@ -1,0 +1,3 @@
+10 INPUT "Value: "; X
+20 IF X == 10 THEN PRINT X
+30 IF X == 20 THEN PRINT "tjugo"
