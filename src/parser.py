@@ -1,5 +1,7 @@
 import re
 
+# >=, <=, >, <, ==
+
 class Parser:
 
     def __init__(self):
@@ -88,8 +90,28 @@ class Parser:
                     if chars[c+1] != "=":
                         rowTokens[index] = self.addTokenObjekt("OPERATOR", "EQ")
                     else:
-                        rowTokens[index] = self.addTokenObjekt("OPERATOR", "EQEQ")
+                        rowTokens[index] = self.addTokenObjekt("BOOLEANSKOP", "EQEQ")
                         next(it)
+                    cmd = ""
+                    index += 1
+                elif cmd == "<":
+                    if chars[c+1] != "=":
+                        rowTokens[index] = self.addTokenObjekt("BOOLEANSKOP", "LT")
+                    else:
+                        rowTokens[index] = self.addTokenObjekt("BOOLEANSKOP", "LTEQ")
+                        next(it)
+                    cmd = ""
+                    index += 1
+                elif cmd == ">":
+                    if chars[c+1] != "=":
+                        rowTokens[index] = self.addTokenObjekt("BOOLEANSKOP", "MT")
+                    else:
+                        rowTokens[index] = self.addTokenObjekt("BOOLEANSKOP", "MTEQ")
+                        next(it)
+                    cmd = ""
+                    index += 1
+                elif cmd == "!=":
+                    rowTokens[index] = self.addTokenObjekt("BOOLEANSKOP", "NEQ")
                     cmd = ""
                     index += 1
                 elif cmd == "+":

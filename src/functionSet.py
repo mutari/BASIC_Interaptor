@@ -79,7 +79,24 @@ class FunctionSet:
         time.sleep(t)
 
     def IF(self, case):
-        return True
+        opeIndex = list(case.items())[self.getKeyOf(case, "BOOLEANSKOP", "type")][0]
+        operator = case[opeIndex]["value"]
+        value1 = self.advancedEval(self.slice(case, 0, opeIndex-1))
+        value2 = self.advancedEval(self.slice(case, opeIndex))
+        if operator == "EQEQ":
+            operator = "=="
+        elif operator == "LT":
+            operator = "<"
+        elif operator == "LTEQ":
+            operator = "<="
+        elif operator == "MT":
+            operator = ">"
+        elif operator == "MTEQ":
+            operator = ">="
+        elif operator == "NEQ":
+            operator = "!="
+
+        return eval(str(value1) + " " + str(operator) + " " + str(value2))
 
     #var functions
     def getVarByName(self, name):
@@ -242,4 +259,10 @@ class FunctionSet:
     def slice(self, dic, start, end = None):
         return dict(list(dic.items())[start:end])
 
-    
+    def getKeyOf(self, data, val, index = "value"):
+        i = 0
+        while i < len(data):
+            if data[list(data.items())[i][0]][index] == val:
+                return i
+            i += 1
+        return None

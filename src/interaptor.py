@@ -10,12 +10,12 @@ import itertools
 # GOTO
 # GOSUB ... RETURN
 # PAUSE
+# IF ... THEN
+# IF ... THEN ... ELSE
 
 # To Do
 
 # Statements
-# IF ... THEN
-# IF ... THEN ... ELSE
 # FOR ... TO ... STEP ... NEXT
 
 # Graphics
@@ -128,12 +128,21 @@ class Interaptor:
                     self.functions.PAUSE(self.slice(tokens[codeIndex], 1))
                 elif Checking["value"] == "IF":
                     statement = self.slice(tokens[codeIndex], 1, self.getIndexOf(tokens[codeIndex], "THEN"))
-                    code = self.slice(tokens[codeIndex], self.getIndexOf(tokens[codeIndex], "THEN")+1)
+                    code = self.slice(tokens[codeIndex], self.getIndexOf(tokens[codeIndex], "THEN")+1, self.getIndexOf(tokens[codeIndex], "ELSE"))
+                    #print(code)
                     if self.functions.IF(statement):
                         row = {}
                         #print("tokens: " + str(tokens[codeIndex]))
                         rowKey = list(tokens.keys())[self.rowIndex-1]
                         row[rowKey] = code
+                        #create a new interaptor white the same functionset
+                        Interaptor(self.manager, "hello", False).interapt(row)
+                    elif self.getIndexOf(tokens[codeIndex], "ELSE") != None:
+                        alternativCode = self.slice(tokens[codeIndex], self.getIndexOf(tokens[codeIndex], "ELSE")+1)
+                        row = {}
+                        #print("tokens: " + str(tokens[codeIndex]))
+                        rowKey = list(tokens.keys())[self.rowIndex-1]
+                        row[rowKey] = alternativCode
                         #create a new interaptor white the same functionset
                         Interaptor(self.manager, "hello", False).interapt(row)
                 else:
@@ -156,10 +165,10 @@ class Interaptor:
     def slice(self, dic, start, end = None):
         return dict(list(dic.items())[start:end])
 
-    def getIndexOf(self, data, type):
+    def getIndexOf(self, data, val, index = "value"):
         i = 0
         while i < len(data):
-            if data[list(data.items())[i][0]]["value"] == type:
+            if data[list(data.items())[i][0]][index] == val:
                 return i
             i += 1
         return None
