@@ -38,7 +38,7 @@ class FunctionSet:
             print("to meny keys")
             exit(1)
         elif key["keysFound"] < int(array["dimension"]):
-            print("to fjue keys")
+            print("to fjue keys: " + str(key) + " array: " + str(array))
             exit(1)
         #else:
         #   print("perfekt")
