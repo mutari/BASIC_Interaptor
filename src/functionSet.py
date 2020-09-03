@@ -8,6 +8,7 @@ class FunctionSet:
         self.VarList = []
         self.ArrayList = []
         self.OldIndexes = []
+        self.forLoop = []
 
     #basic static functions
     def PRINT(self, tokens):
@@ -35,20 +36,21 @@ class FunctionSet:
         #test if the right amount of array keys
         if key["keysFound"] > int(array["dimension"]):
             print("to meny keys")
-            exit
+            exit(1)
         elif key["keysFound"] < int(array["dimension"]):
             print("to fjue keys")
-            exit
+            exit(1)
         #else:
         #   print("perfekt")
 
-        #print("keys: " + key["keys"])
+        #print("keys: " + str(key))
 
         #print("data: " + str(data))
         #print("endOfKey: " + str(key["endOfKeys"]))
 
-        if data[key["endOfKeys"] + 1]["value"] == "EQ":
+        if data[list(data.items())[key["endOfKeys"]][0]]["value"] == "EQ":
             data = self.slice(data, key["endOfKeys"]+1)
+            #print(data)
             value = self.advancedEval(data)
             self.uppdateArray(name, key["keys"], value)
             #print("Array: " + str(self.ArrayList))
@@ -96,24 +98,71 @@ class FunctionSet:
         elif operator == "NEQ":
             operator = "!="
 
-        return eval(str(value1) + " " + str(operator) + " " + str(value2))
+        return eval("\"" + str(value1) + "\" " + str(operator) + " \"" + str(value2) + "\"")
+
+    def FOR(self, data, rowIndex):
+        keyTO = self.getKeyOf(data, "TO")
+        keySTEP = self.getKeyOf(data, "STEP")
+
+        # create a variable
+        var = self.slice(data, 0, keyTO)
+        keys = list(data.items())
+        varName = var[1]
+        if(var[2]["value"] == "EQ"):
+            self.LET(varName, self.slice(var, 2))
+        else:
+            print("Error interaptor: missing EQ when declearing var")
+            exit(1)
+
+        goal = None
+        step = None
+        if(keySTEP):
+            goal = self.slice(data, keyTO, keySTEP)
+            step = self.slice(data, keySTEP + 1)
+            step = self.advancedEval(step)
+        else:
+            goal = self.slice(data, keyTO + 1)
+            step = 1
+        goal = self.advancedEval(goal)
+
+        self.forLoop.append({"var": varName, "goal": goal, "step": step, "row": rowIndex})
+
+    def NEXT(self, varName):
+        loop = self.forLoop[len(self.forLoop) - 1]
+        if loop["var"]["value"] != varName[1]["value"]:
+            print("Forloops in wrong queue")
+            exit(1)
+        value = self.getVarByName(loop["var"]["value"])
+        if value["value"] + loop["step"] >= loop["goal"]:
+            self.forLoop.pop(len(self.forLoop) - 1)
+            self.uppdateVar(loop["var"]["value"], "None") # borde ändra till att döda variablen
+            return None
+        self.uppdateVar(loop["var"]["value"], value["value"] + loop["step"])
+        return loop["row"]
+        
 
     #var functions
     def getVarByName(self, name):
         for var in self.VarList:
             if var["name"] == name :
                 return var
-        return None
+        print("Error: array whit name: " + str(name) + " is not deklarerad ")
+        exit(1)
 
     def createNewVar(self, name, value):
         self.VarList.append({"name": name, "value": value})
+
+    def uppdateVar(self, name, value):
+        var = self.getVarByName(name)
+        var["value"] = value
 
     #array functions
     def getArrayByName(self, name):
         for array in self.ArrayList:
             if array["name"] == name:
                 return array
-        return None
+        print("Error: array whit name: " + str(name) + " is not deklarerad ")
+        exit(1)
 
     def createNewArray(self, name, dim):
         self.ArrayList.append({"name": name, "dimension": dim, "value_list": {}})
@@ -178,6 +227,7 @@ class FunctionSet:
                 #print("test:::: " + str(key))
                 for j in range(0, key["endOfKeys"]):
                     next(it)
+                #print(self.ArrayList)
                 value = self.getArrayByName(token["value"])["value_list"][key["keys"]]
                 if self.isNumber(value):
                     out[c] = ({"type": "NUM", "value": value})

@@ -12,11 +12,11 @@ import itertools
 # PAUSE
 # IF ... THEN
 # IF ... THEN ... ELSE
+# FOR ... TO ... STEP ... NEXT
 
 # To Do
 
 # Statements
-# FOR ... TO ... STEP ... NEXT
 
 # Graphics
 # PLOT
@@ -45,6 +45,7 @@ class Interaptor:
 
     def __init__(self, setManager, functionSetName, new = True):
         self.rowIndex = 0
+        self.new = new
         if new:
             self.functions = FunctionSet(functionSetName)
             self.manager = setManager
@@ -53,7 +54,7 @@ class Interaptor:
             self.manager = setManager
             self.functions = self.manager.getByName(functionSetName)
 
-    def moveCodeIndex(self, tokens, index = 0): 
+    def moveCodeIndex(self, tokens, index = 0):
         temp = list(tokens.keys())[index]
         self.rowIndex = index + 1
         return temp
@@ -93,7 +94,7 @@ class Interaptor:
                         self.functions.LET(varName, self.slice(tokens[codeIndex], 3))
                     else:
                         print("Error interaptor122")
-                        exit
+                        exit(1)
                 elif Checking["value"] == "ARRAY":
                     arrayName = tokens[codeIndex][c+1]
                     arrayDim = 1
@@ -109,13 +110,17 @@ class Interaptor:
                     self.functions.INPUT(varName, text)
                 elif Checking["value"] == "END":
                     print("The Script Whs Terminated(row: " + codeIndex + ")")
-                    exit
+                    exit(1)
                 elif Checking["value"] == "GOTO":
                     number = self.functions.GOTO(self.slice(tokens[codeIndex], 1))
+                    if self.new == False:
+                        return number 
                     codeIndex = self.moveCodeIndex(tokens, self.findRowIndexByKey(tokens, number))
                     continue
                 elif Checking["value"] == "GOSUB":
                     number = self.functions.GOSUB(self.slice(tokens[codeIndex], 1), codeIndex)
+                    if self.new == False:
+                        return number 
                     codeIndex = self.moveCodeIndex(tokens, self.findRowIndexByKey(tokens, number))
                     continue
                 elif Checking["value"] == "RETURN":
@@ -129,25 +134,41 @@ class Interaptor:
                 elif Checking["value"] == "IF":
                     statement = self.slice(tokens[codeIndex], 1, self.getIndexOf(tokens[codeIndex], "THEN"))
                     code = self.slice(tokens[codeIndex], self.getIndexOf(tokens[codeIndex], "THEN")+1, self.getIndexOf(tokens[codeIndex], "ELSE"))
-                    #print(code)
+                    #print(self.functions.IF(statement))
                     if self.functions.IF(statement):
                         row = {}
                         #print("tokens: " + str(tokens[codeIndex]))
                         rowKey = list(tokens.keys())[self.rowIndex-1]
                         row[rowKey] = code
+                        #print(row)
                         #create a new interaptor white the same functionset
-                        Interaptor(self.manager, "hello", False).interapt(row)
+                        number = Interaptor(self.manager, "hello", False).interapt(row)
+                        if number: 
+                            codeIndex = self.moveCodeIndex(tokens, self.findRowIndexByKey(tokens, number))
+                            continue
                     elif self.getIndexOf(tokens[codeIndex], "ELSE") != None:
                         alternativCode = self.slice(tokens[codeIndex], self.getIndexOf(tokens[codeIndex], "ELSE")+1)
                         row = {}
-                        #print("tokens: " + str(tokens[codeIndex]))
+                        #print("tokens: " + str(alternativCode))
                         rowKey = list(tokens.keys())[self.rowIndex-1]
                         row[rowKey] = alternativCode
+                        #print(row)
                         #create a new interaptor white the same functionset
-                        Interaptor(self.manager, "hello", False).interapt(row)
+                        number = Interaptor(self.manager, "hello", False).interapt(row)
+                        if number: 
+                            codeIndex = self.moveCodeIndex(tokens, self.findRowIndexByKey(tokens, number)) # GoTO/GoSub returenrar row number
+                            continue
+                elif Checking["value"] == "FOR":
+                    self.functions.FOR(self.slice(tokens[codeIndex], 1), codeIndex)
+                elif Checking["value"] == "NEXT":
+                    number = self.functions.NEXT(self.slice(tokens[codeIndex], 1))
+                    if number != None:
+                        codeIndex = self.moveCodeIndex(tokens, self.findRowIndexByKey(tokens, number))
+                        codeIndex = self.moveCodeIndex(tokens, self.rowIndex)
+                        continue
                 else:
                     print("Error interaptor 123")
-                    exit
+                    exit(1)
             elif Checking["type"] == Interaptor.VARARRAY:
                 arrayName = Checking["value"]
                 keys = self.slice(tokens[codeIndex], 1)

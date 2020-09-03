@@ -72,8 +72,8 @@
 1004 FOR I = 1 TO N[1]
 1005 N[2] = RAND(W)-1
 1006 N[3] = RAND(H)-1
-1007 B[N[2]][N[3]] = c[7]
-1010 IF B[N[2]][N[3]] = "red" THEN GOTO 1100
+1007 IF B[N[2]][N[3]] = "red" THEN GOTO 1100
+1010 B[N[2]][N[3]] = c[7]
 1011 NEXT I
 1099 RETURN
 

@@ -188,6 +188,14 @@ class Parser:
                     rowTokens[index] = self.addTokenObjekt("STATIC", "TO")
                     cmd = ""
                     index += 1
+                elif cmd == "STEP":
+                    rowTokens[index] = self.addTokenObjekt("STATIC", "STEP")
+                    cmd = ""
+                    index += 1
+                elif cmd == "NEXT":
+                    rowTokens[index] = self.addTokenObjekt("STATIC", "NEXT")
+                    cmd = ""
+                    index += 1
                 elif cmd == "GOSUB":
                     rowTokens[index] = self.addTokenObjekt("STATIC", "GOSUB")
                     cmd = ""
