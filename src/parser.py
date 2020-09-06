@@ -238,8 +238,16 @@ class Parser:
                     index += 1
                 elif cmd == "REM": #if its a note then it just hops ower it
                     rowTokens[index] = self.addTokenObjekt("STATIC", "REM")
-                    cmd == ""
+                    cmd = ""
                     break
+                elif cmd == "FALSE":
+                    rowTokens[index] = self.addTokenObjekt("BOOLEAN", "FALSE")
+                    cmd = ""
+                    index += 1
+                elif cmd == "TRUE":
+                    rowTokens[index] = self.addTokenObjekt("BOOLEAN", "TRUE")
+                    cmd = ""
+                    index += 1
 
                 #   funktions i need
                 #       COLOR()

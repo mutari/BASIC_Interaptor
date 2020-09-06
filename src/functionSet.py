@@ -1,5 +1,6 @@
 import re
 import time
+from display import Display
 
 class FunctionSet:
     
@@ -140,6 +141,13 @@ class FunctionSet:
         self.uppdateVar(loop["var"]["value"], value["value"] + loop["step"])
         return loop["row"]
         
+    def DISPLAY(self, width, height, boolean):
+        width = self.advancedEval(width)
+        height = self.advancedEval(height)
+        boolean = boolean[list(boolean.items())[0][0]]["value"]
+        print(width, height, boolean)
+        display = Display(width, height)
+
 
     #var functions
     def getVarByName(self, name):
