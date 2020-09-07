@@ -72,6 +72,9 @@ class Interaptor:
             #it = iter(range(0, len(tokens[codeIndex])))
             #for c in it:
             # c is the index of the pecefic token in the row 
+            if len(list(tokens[codeIndex].items())) <= 0:
+                print("Syntax error row: " + str(codeIndex))
+                exit(1)
             c = list(tokens[codeIndex].items())[0][0]
             Checking = tokens[codeIndex][c]
 
@@ -171,6 +174,7 @@ class Interaptor:
                     exit(1)
             elif Checking["type"] == Interaptor.VARARRAY:
                 arrayName = Checking["value"]
+                #print(tokens[codeIndex])
                 keys = self.slice(tokens[codeIndex], 1)
                 #print("keys: " + str(keys))
                 self.functions.ARRAY_UPPDATE(arrayName, keys)

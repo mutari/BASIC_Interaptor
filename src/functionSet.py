@@ -28,14 +28,13 @@ class FunctionSet:
 
     def ARRAY_UPPDATE(self, name, data):
         array = self.getArrayByName(name)
-
         key = self.generateArrayKeys(data)
 
         #print("key: " + str(key) + ",  " + str(array["dimension"]))
 
         #test if the right amount of array keys
         if key["keysFound"] > int(array["dimension"]):
-            print("to meny keys")
+            print("to meny keys" + str(key) + " array: " + str(array))
             exit(1)
         elif key["keysFound"] < int(array["dimension"]):
             print("to fjue keys: " + str(key) + " array: " + str(array))
@@ -133,11 +132,11 @@ class FunctionSet:
             print("Forloops in wrong queue")
             exit(1)
         value = self.getVarByName(loop["var"]["value"])
-        if value["value"] + loop["step"] >= loop["goal"]:
+        if int(value["value"]) + int(loop['step']) >= loop["goal"]:
             self.forLoop.pop(len(self.forLoop) - 1)
             self.uppdateVar(loop["var"]["value"], "None") # borde ändra till att döda variablen
             return None
-        self.uppdateVar(loop["var"]["value"], value["value"] + loop["step"])
+        self.uppdateVar(loop["var"]["value"], int(value["value"]) + int(loop["step"]))
         return loop["row"]
         
 
@@ -150,6 +149,10 @@ class FunctionSet:
         exit(1)
 
     def createNewVar(self, name, value):
+        for var in self.VarList:
+            if var["name"] == name: 
+                var["value"] = value #if var exists overide it
+                return
         self.VarList.append({"name": name, "value": value})
 
     def uppdateVar(self, name, value):
@@ -178,7 +181,6 @@ class FunctionSet:
         keysfound = 0
         it = iter(range(list(data.items())[0][0], len(data) + list(data.items())[0][0]))
         for c in it:
-            #print(data[c])
             if data[c]["value"] == "LEFTBLOCK":
                 continue
             elif data[c]["value"] == "RIGHTBLOCK":
@@ -190,13 +192,19 @@ class FunctionSet:
                     break
                 else:
                     continue 
-            # test for vars to 
+            # rewrite to suport advancedEval
             elif data[c]["type"] == "NUM":
                 keysfound += 1
                 if keys != "":
                     keys += "," + str(data[c]["value"])
                 else:
                     keys += str(data[c]["value"])
+            elif data[c]["type"] == "VAR":
+                keysfound += 1
+                if keys != "":
+                    keys += "," + str(self.getVarByName(data[c]["value"])["value"])
+                else:
+                    keys += str(self.getVarByName(data[c]["value"])["value"])
             else:
                 print("Array syntax error data :: " + str(data))
                 exit
@@ -209,7 +217,6 @@ class FunctionSet:
     
     #omvandlar variablar till des värde
     def translate(self, input):
-        #print("input:::" + str(input))
         out = {}
         it = iter(range(0, len(input)))
         for c in it:
@@ -222,18 +229,14 @@ class FunctionSet:
                 else:
                     out[c] = ({"type": "STR", "value": value})
             elif token["type"] == "VARARRAY":
-                #print("clisc :: " + str(self.slice(input, c + 1)))
                 key = self.generateArrayKeys(self.slice(input, c + 1))
-                #print("test:::: " + str(key))
                 for j in range(0, key["endOfKeys"]):
                     next(it)
-                #print(self.ArrayList)
                 value = self.getArrayByName(token["value"])["value_list"][key["keys"]]
                 if self.isNumber(value):
                     out[c] = ({"type": "NUM", "value": value})
                 else:
                     out[c] = ({"type": "STR", "value": value})
-                #print("key: " + str(key))
             else:
                 out[c] = (token)
         return out
@@ -241,9 +244,7 @@ class FunctionSet:
     #evulerar utan sträng
     def evalNum(self, input):
         out = ""
-        #print("input: " + str(input))
         for c in input:
-            #print("C: " + str(input[c]))
             value = input[c]["value"]
             key = input[c]["type"]
             if key == "NUM":
@@ -268,7 +269,6 @@ class FunctionSet:
         i = 0
         while i < len(input):
             token = input[list(input.items())[i][0]]
-            #print("token: " + str(token))
             if i % 2 == 0 : #if first item
                 if token["type"] == "STR":
                     out += str(token["value"])
@@ -294,11 +294,9 @@ class FunctionSet:
         return input(text)
 
     def advancedEval(self, value):
-        #print(value)
         #translates all the variabels to ther value
         trans = self.translate(value)
         
-        #print("trans :: " + str(trans))
         #returns False if the value have a char that is not a number
         res = self.evalNum(trans)
         if res == False:
