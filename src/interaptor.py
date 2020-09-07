@@ -161,6 +161,15 @@ class Interaptor:
                         if number: 
                             codeIndex = self.moveCodeIndex(tokens, self.findRowIndexByKey(tokens, number)) # GoTO/GoSub returenrar row number
                             continue
+                elif Checking["value"] == "DISPLAY":
+                    data = self.slice(tokens[codeIndex], 1)
+                    comma = self.getIndexOf(data, "COMMA")
+                    width = self.slice(data, 0, comma)
+                    data = self.slice(data, comma + 1)
+                    comma = self.getIndexOf(data, "COMMA")
+                    height = self.slice(data, 0, comma)
+                    boolean = self.slice(data, comma + 1, len(data))
+                    self.functions.DISPLAY(width, height, boolean)
                 elif Checking["value"] == "FOR":
                     self.functions.FOR(self.slice(tokens[codeIndex], 1), codeIndex)
                 elif Checking["value"] == "NEXT":

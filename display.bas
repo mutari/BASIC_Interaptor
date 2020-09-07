@@ -1,0 +1,2 @@
+10 PRINT "display.bas RUNNING"
+20 DISPLAY 100 + 50, 100 + 50, FALSE
