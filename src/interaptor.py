@@ -187,6 +187,14 @@ class Interaptor:
                 keys = self.slice(tokens[codeIndex], 1)
                 #print("keys: " + str(keys))
                 self.functions.ARRAY_UPPDATE(arrayName, keys)
+            elif Checking["type"] == Interaptor.VAR:
+                if(tokens[codeIndex][c+1]["value"] == "EQ"):
+                    #print(self.slice(tokens[codeIndex], 3))
+                    self.functions.LET(Checking, self.slice(tokens[codeIndex], 2))
+                else:
+                    print("Error interaptor122")
+                    exit(1)
+
             #print(tokens[codeIndex][c]["value"])
 
             #move tokens list forward

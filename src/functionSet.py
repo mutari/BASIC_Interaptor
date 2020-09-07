@@ -1,6 +1,8 @@
 import re
 import time
-from display import Display
+import sys
+if len(sys.argv) >= 3 and sys.argv[2] == '-d':
+    from display import Display
 
 class FunctionSet:
     
@@ -187,11 +189,21 @@ class FunctionSet:
         #get the arraý keys
         endOfKeys = -1
         keysfound = 0
+        exp = False
+        expObj = {}
         it = iter(range(list(data.items())[0][0], len(data) + list(data.items())[0][0]))
         for c in it:
             if data[c]["value"] == "LEFTBLOCK":
+                exp = True
                 continue
             elif data[c]["value"] == "RIGHTBLOCK":
+                keysfound += 1
+                if keys != "":
+                    keys += ',' + str(self.advancedEval(expObj))
+                else:
+                    keys += str(self.advancedEval(expObj))
+                expObj = {}
+                exp = False
                 if c+1 >= len(data) + list(data.items())[0][0]:
                     endOfKeys = c - (int(list(data.items())[0][0])-1)
                     break
@@ -201,18 +213,8 @@ class FunctionSet:
                 else:
                     continue 
             # rewrite to suport advancedEval
-            elif data[c]["type"] == "NUM":
-                keysfound += 1
-                if keys != "":
-                    keys += "," + str(data[c]["value"])
-                else:
-                    keys += str(data[c]["value"])
-            elif data[c]["type"] == "VAR":
-                keysfound += 1
-                if keys != "":
-                    keys += "," + str(self.getVarByName(data[c]["value"])["value"])
-                else:
-                    keys += str(self.getVarByName(data[c]["value"])["value"])
+            elif exp:
+                expObj[c] = data[c]
             else:
                 print("Array syntax error data :: " + str(data))
                 exit
