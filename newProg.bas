@@ -27,8 +27,9 @@
 310 FOR I = 0 TO N
 320 INPUT Q[I][0] + "  "; A
 330 IF A == Q[I][1] THEN GOSUB 360 ELSE PRINT "Du svarade fel"
+340 GOSUB 1000
 350 NEXT I
-351 PRINT R + "/" + N
+351 PRINT "Slutgiltigt resultat: " + R + "/" + N
 352 GOSUB 1000
 399 GOTO 102
 
@@ -43,6 +44,7 @@
 420 INPUT "Svar (YES/NO): "; A
 421 Q[N][1] = A
 430 N = N + 1
+435 GOSUB 1000
 440 GOTO 102
 
 500 REM ändra

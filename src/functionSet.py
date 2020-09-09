@@ -135,7 +135,7 @@ class FunctionSet:
             print("Forloops in wrong queue")
             exit(1)
         value = self.getVarByName(loop["var"]["value"])
-        if int(value["value"]) + int(loop['step']) >= loop["goal"]:
+        if int(value["value"]) + int(loop['step']) >= int(loop["goal"]):
             self.forLoop.pop(len(self.forLoop) - 1)
             self.uppdateVar(loop["var"]["value"], "None") # borde ändra till att döda variablen
             return None
@@ -257,6 +257,7 @@ class FunctionSet:
         for c in input:
             value = input[c]["value"]
             key = input[c]["type"]
+            print(self.VarList)
             if key == "NUM":
                 out += str(value)
             elif key == "OPERATOR":
