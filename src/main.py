@@ -1,8 +1,8 @@
+import json
+import sys
 from parser import Parser
 from interaptor import Interaptor
 from setManager import SetManager
-import json
-import sys
 
 commandList = []
 commandMap = {}
@@ -30,6 +30,11 @@ if len(sys.argv) > 1:
 else:
     script = "main.bas"
 
+if len(sys.argv) > 2:
+    manager_name = sys.argv[2]
+else:
+    manager_name = "hello"
+
 commandList = getFileInput(script)
 
 commandMap = createHashMap(commandList)
@@ -42,9 +47,9 @@ tokens = parser.ParseMap(commandMap)
 
 funktionManager = SetManager()
 
-interaptor = Interaptor(funktionManager, "hello")
+interaptor = Interaptor(funktionManager, manager_name)
 
-f = funktionManager.getByName("hello")
+f = funktionManager.getByName(manager_name)
 #print(f.getName())
 
 interaptor.interapt(tokens)
