@@ -17,23 +17,16 @@ class FunctionSet:
     def PRINT(self, tokens):
         str = self.advancedEval(tokens)
         self.basicPrint(str)
-        #print(self.VarList)
 
     def LET(self, name, value):
-        #print(self.translate(value))
         self.createNewVar(name["value"], self.advancedEval(value))
-        #print("varList: " + str(self.VarList))
 
     def ARRAY_CREATE(self, name, dim):
-        #print("array name: " + str(name) + "     dimension: " + str(dim))
         self.createNewArray(name["value"], dim)
-        #print("arrayList: " + str(self.ArrayList))
 
     def ARRAY_UPPDATE(self, name, data):
         array = self.getArrayByName(name)
         key = self.generateArrayKeys(data)
-
-        #print("key: " + str(key) + ",  " + str(array["dimension"]))
 
         #test if the right amount of array keys
         if key["keysFound"] > int(array["dimension"]):
@@ -42,23 +35,13 @@ class FunctionSet:
         elif key["keysFound"] < int(array["dimension"]):
             print("to fjue keys: " + str(key) + " array: " + str(array))
             exit(1)
-        #else:
-        #   print("perfekt")
-
-        #print("keys: " + str(key))
-
-        #print("data: " + str(data))
-        #print("endOfKey: " + str(key["endOfKeys"]))
 
         if data[list(data.items())[key["endOfKeys"]][0]]["value"] == "EQ":
             data = self.slice(data, key["endOfKeys"]+1)
-            #print(data)
             value = self.advancedEval(data)
             self.uppdateArray(name, key["keys"], value)
-            #print("Array: " + str(self.ArrayList))
 
     def INPUT(self, varName, text):
-        #print("var: " + str(varName) + "    text: " + str(text))
         text = self.advancedEval(text)
         value = self.basicInput(text)
         self.createNewVar(varName["value"], value)
@@ -149,6 +132,9 @@ class FunctionSet:
         print(width, height, boolean)
         display = Display(width, height)
 
+    def EXPORT(self, data):
+        var = self.getVarByName(data[1]["value"])
+        print("(exp:)" + str(var["name"]) + ":" + str(var["value"]))
 
     #var functions
     def getVarByName(self, name):
@@ -257,7 +243,7 @@ class FunctionSet:
         for c in input:
             value = input[c]["value"]
             key = input[c]["type"]
-            print(self.VarList)
+            #print(self.VarList)
             if key == "NUM":
                 out += str(value)
             elif key == "OPERATOR":

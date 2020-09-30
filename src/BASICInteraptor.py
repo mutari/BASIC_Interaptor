@@ -170,6 +170,8 @@ class Interaptor:
                     height = self.slice(data, 0, comma)
                     boolean = self.slice(data, comma + 1, len(data))
                     self.functions.DISPLAY(width, height, boolean)
+                elif Checking["value"] == "EXPORT":
+                    self.functions.EXPORT(self.slice(tokens[codeIndex], 1))
                 elif Checking["value"] == "FOR":
                     self.functions.FOR(self.slice(tokens[codeIndex], 1), codeIndex)
                 elif Checking["value"] == "NEXT":

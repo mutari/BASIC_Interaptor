@@ -1,7 +1,7 @@
 import json
 import sys
-from parser import Parser
-from interaptor import Interaptor
+from BASICParser import Parser
+from BASICInteraptor import Interaptor
 from setManager import SetManager
 
 commandList = []
@@ -24,6 +24,8 @@ def createHashMap(cmList):
             continue
         cmMap[number] = " ".join(split)
     return cmMap
+
+# python3 main.py {bas file} {set name} {var1 name} {värde1} {var2 name} {värde2}
 
 if len(sys.argv) > 1:
     script = sys.argv[1]
@@ -50,6 +52,8 @@ funktionManager = SetManager()
 interaptor = Interaptor(funktionManager, manager_name)
 
 f = funktionManager.getByName(manager_name)
-#print(f.getName())
+
+for i in range(3, len(sys.argv), 2):
+    f.createNewVar(sys.argv[i], sys.argv[i+1])
 
 interaptor.interapt(tokens)

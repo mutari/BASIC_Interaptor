@@ -224,6 +224,10 @@ class Parser:
                     rowTokens[index] = self.addTokenObjekt("STATIC", "PAUSE")
                     cmd = ""
                     index += 1
+                elif cmd == "EXPORT":
+                    rowTokens[index] = self.addTokenObjekt("STATIC", "EXPORT")
+                    cmd = ""
+                    index += 1
                 elif cmd == "CLS":
                     rowTokens[index] = self.addTokenObjekt("STATIC", "CLS")
                     cmd = ""
