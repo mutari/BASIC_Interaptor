@@ -44,7 +44,7 @@ commandMap = createHashMap(commandList)
 
 parser = Parser()
 tokens = parser.ParseMap(commandMap)
-#print(json.dumps(tokens, indent=2))
+print(json.dumps(tokens, indent=2))
 #print(parser.getCommandMap())
 
 funktionManager = SetManager()
