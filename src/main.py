@@ -35,7 +35,7 @@ else:
 if len(sys.argv) > 2:
     manager_name = sys.argv[2]
 else:
-    manager_name = "hello"
+    manager_name = "main"
 
 commandList = getFileInput(script)
 
@@ -44,7 +44,7 @@ commandMap = createHashMap(commandList)
 
 parser = Parser()
 tokens = parser.ParseMap(commandMap)
-print(json.dumps(tokens, indent=2))
+#print(json.dumps(tokens, indent=2))
 #print(parser.getCommandMap())
 
 funktionManager = SetManager()

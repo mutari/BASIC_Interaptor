@@ -134,7 +134,7 @@ class FunctionSet:
 
     def EXPORT(self, data):
         var = self.getVarByName(data[1]["value"])
-        print("(exp:)" + str(var["name"]) + ":" + str(var["value"]))
+        print("exp:" + str(var["name"]) + ":" + str(var["value"]))
 
     #var functions
     def getVarByName(self, name):

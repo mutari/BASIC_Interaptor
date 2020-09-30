@@ -113,7 +113,7 @@ class Interaptor:
                     self.functions.INPUT(varName, text)
                 elif Checking["value"] == "END":
                     print("The Script Whs Terminated(row: " + codeIndex + ")")
-                    exit(1)
+                    exit(0)
                 elif Checking["value"] == "GOTO":
                     number = self.functions.GOTO(self.slice(tokens[codeIndex], 1))
                     if self.new == False:
@@ -145,7 +145,7 @@ class Interaptor:
                         row[rowKey] = code
                         #print(row)
                         #create a new interaptor white the same functionset
-                        number = Interaptor(self.manager, "hello", False).interapt(row)
+                        number = Interaptor(self.manager, self.functions.name, False).interapt(row)
                         if number: 
                             codeIndex = self.moveCodeIndex(tokens, self.findRowIndexByKey(tokens, number))
                             continue
@@ -157,7 +157,7 @@ class Interaptor:
                         row[rowKey] = alternativCode
                         #print(row)
                         #create a new interaptor white the same functionset
-                        number = Interaptor(self.manager, "hello", False).interapt(row)
+                        number = Interaptor(self.manager, self.functions.name, False).interapt(row)
                         if number: 
                             codeIndex = self.moveCodeIndex(tokens, self.findRowIndexByKey(tokens, number)) # GoTO/GoSub returenrar row number
                             continue

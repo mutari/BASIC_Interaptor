@@ -248,7 +248,7 @@ class Parser:
                     rowTokens[index] = self.addTokenObjekt("BOOLEAN", "TRUE")
                     cmd = ""
                     index += 1
-                elif self.isBokstav(cmd) == 1 and (self.getNext(chars, c+1) == " " or self.getNext(chars, c+1) == "\n" or self.getNext(chars, c+1) == "," or self.getNext(chars, c+1) == "]"):
+                elif len(cmd) > 0 and (self.getNext(chars, c+1) == " " or self.getNext(chars, c+1) == "\n" or self.getNext(chars, c+1) == "," or self.getNext(chars, c+1) == "]"):
                     rowTokens[index] = self.addTokenObjekt("VAR", cmd)
                     cmd = ""
                     index += 1

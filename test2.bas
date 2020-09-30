@@ -1,0 +1,3 @@
+10 PRINT TEST
+20 TEST = TEST + "???????"
+30 EXPORT TEST
