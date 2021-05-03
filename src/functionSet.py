@@ -1,8 +1,6 @@
 import re
 import time
 import sys
-if len(sys.argv) >= 3 and sys.argv[2] == '-d':
-    from display import Display
 
 class FunctionSet:
     
@@ -150,6 +148,7 @@ class FunctionSet:
                 var["value"] = value #if var exists overide it
                 return
         self.VarList.append({"name": name, "value": value})
+        #print(self.VarList)
 
     def uppdateVar(self, name, value):
         var = self.getVarByName(name)
