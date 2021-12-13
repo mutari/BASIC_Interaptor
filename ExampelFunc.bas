@@ -3,7 +3,7 @@
 10 IMPORT "file.bas" AS file
 
 11 REM write out a var from file 
-20 PRINT file.var
+20 PRINT file->var
 
 21 REM call a function by the name of ADD in file
-30 CALL file.ADD 
+30 CALL file->ADD 

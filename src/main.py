@@ -3,27 +3,10 @@ import sys
 from BASICParser import Parser
 from BASICInteraptor import Interaptor
 from setManager import SetManager
+from helpFunctions import getFileInput, createHashMap
 
 commandList = []
 commandMap = {}
-
-def getFileInput(name):
-    cmList = []
-    f = open(name, "r")
-    for x in f:
-        cmList.append(x + " ")
-    return cmList
-
-def createHashMap(cmList):
-    cmMap = {}
-    for x in cmList:
-        split = x.split(" ")
-        number = split[0]
-        del split[0]        
-        if not number.isdecimal():
-            continue
-        cmMap[number] = " ".join(split)
-    return cmMap
 
 # python3 main.py {bas file} {set name} {mode (dev|pro)} {var1 name} {värde1} {var2 name} {värde2}
 
@@ -62,3 +45,6 @@ for i in range(4, len(sys.argv), 2):
     f.createNewVar(sys.argv[i], sys.argv[i+1])
 
 interaptor.interapt(tokens)
+
+#print(json.dumps(f.VarList, indent=2))
+#print(json.dumps(f.ArrayList, indent=2))

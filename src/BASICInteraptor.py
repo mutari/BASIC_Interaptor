@@ -16,6 +16,8 @@ import traceback
 # FOR ... TO ... STEP ... NEXT
 
 # To Do
+# NAMESPACE
+# IMPORT ... AS ...
 
 # Statements
 
@@ -49,7 +51,7 @@ class Interaptor:
         self.new = new
         self.mode = mode
         if new:
-            self.functions = FunctionSet(functionSetName)
+            self.functions = FunctionSet(functionSetName, mode)
             self.manager = setManager
             self.manager.addSet(self.functions)
         else:
@@ -128,6 +130,13 @@ class Interaptor:
                         if self.new == False:
                             return number 
                         codeIndex = self.moveCodeIndex(tokens, self.findRowIndexByKey(tokens, number))
+                        continue
+                    elif Checking["value"] == "NAMESPACE":
+                        self.functions.NAMESPACE(self.slice(tokens[codeIndex], 1))
+                    elif Checking["value"] == "IMPORT":
+                        path = self.slice(tokens[codeIndex], 1, self.getIndexOf(tokens[codeIndex], "AS"))
+                        importVar = self.slice(tokens[codeIndex], self.getIndexOf(tokens[codeIndex], "AS") + 1)
+                        self.functions.IMPORT(path, importVar)
                         continue
                     elif Checking["value"] == "RETURN":
                         number = self.functions.RETURN()

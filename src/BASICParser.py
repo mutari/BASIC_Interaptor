@@ -190,6 +190,18 @@ class Parser:
                     rowTokens[index] = self.addTokenObjekt("STATIC", "GOSUB")
                     cmd = ""
                     index += 1
+                elif cmd == "NAMESPACE" and self.getNext(chars, c+1) == " ":
+                    rowTokens[index] = self.addTokenObjekt("STATIC", "NAMESPACE")
+                    cmd = ""
+                    index += 1
+                elif cmd == "IMPORT" and self.getNext(chars, c+1) == " ":
+                    rowTokens[index] = self.addTokenObjekt("STATIC", "IMPORT")
+                    cmd = ""
+                    index += 1
+                elif cmd == "AS" and self.getNext(chars, c+1) == " ":
+                    rowTokens[index] = self.addTokenObjekt("STATIC", "AS")
+                    cmd = ""
+                    index += 1
                 elif cmd == "RETURN" and (self.getNext(chars, c+1) == " " or self.getNext(chars, c+1) == "\n"):
                     rowTokens[index] = self.addTokenObjekt("STATIC", "RETURN")
                     cmd = ""

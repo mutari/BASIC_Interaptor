@@ -1,15 +1,16 @@
-import re
 import time
-import sys
+from helpFunctions import getFileInput, createHashMap
 
 class FunctionSet:
     
-    def __init__(self, threadname):
+    def __init__(self, threadname, mode):
         self.name = threadname
         self.VarList = []
         self.ArrayList = []
         self.OldIndexes = []
         self.forLoop = []
+        self.namespace = ""
+        self.mode = mode
 
     #basic static functions
     def PRINT(self, tokens):
@@ -122,6 +123,22 @@ class FunctionSet:
             return None
         self.uppdateVar(loop["var"]["value"], int(value["value"]) + int(loop["step"]))
         return loop["row"]
+
+    def NAMESPACE(self, tokens):
+        namespace = self.advancedEval(tokens)
+        self.namespace = namespace
+
+    def IMPORT(self, path, importVar):
+
+        commandList = getFileInput(path)
+        print(commandList)
+        
+
+
+
+
+
+        print(path, importVar)
         
     def DISPLAY(self, width, height, boolean):
         width = self.advancedEval(width)
@@ -136,6 +153,7 @@ class FunctionSet:
 
     #var functions
     def getVarByName(self, name):
+        name = self.getNamespace(name);
         for var in self.VarList:
             if var["name"] == name :
                 return var
@@ -143,6 +161,7 @@ class FunctionSet:
         exit(1)
 
     def createNewVar(self, name, value):
+        name = self.getNamespace(name);
         for var in self.VarList:
             if var["name"] == name: 
                 var["value"] = value #if var exists overide it
@@ -151,11 +170,13 @@ class FunctionSet:
         #print(self.VarList)
 
     def uppdateVar(self, name, value):
+        name = self.getNamespace(name);
         var = self.getVarByName(name)
         var["value"] = value
 
     #array functions
     def getArrayByName(self, name):
+        name = self.getNamespace(name);
         for array in self.ArrayList:
             if array["name"] == name:
                 return array
@@ -163,12 +184,20 @@ class FunctionSet:
         exit(1)
 
     def createNewArray(self, name, dim):
+        name = self.getNamespace(name);
         self.ArrayList.append({"name": name, "dimension": dim, "value_list": {}})
 
     def uppdateArray(self, name, keys, value):
         array = self.getArrayByName(name)
         array["value_list"][keys] = value
     
+    def getNamespace(self, name):
+        if len(name.split('@')) > 1:
+            return name
+        if self.namespace != "":
+            name = self.namespace + "@" + name
+        return name
+
     def generateArrayKeys(self, data):
         keys = ""
         #get the arraý keys
@@ -273,7 +302,7 @@ class FunctionSet:
                 else:
                     return "Error evalStr input :: " + str(input)
                     exit
-            elif token["value"] != "PLUS":
+            elif token["value"] != "PLUS" and token["value"] != "MINUS":
                 return "Error evalStr input :: " + str(input)
                 exit
             i += 1
@@ -295,7 +324,7 @@ class FunctionSet:
         
         #returns False if the value have a char that is not a number
         res = self.evalNum(trans)
-        if res == False:
+        if res is False:
             #if value is not a string
             res = self.evalStr(trans)
         return res
