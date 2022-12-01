@@ -25,15 +25,23 @@ if len(sys.argv) > 3:
 else:
     mode = "pro"
 
+if len(sys.argv) > 4:
+    debug = sys.argv[4]
+else:
+    debug = "false"
+
 commandList = getFileInput(script)
 
 commandMap = createHashMap(commandList)
-#print(commandMap)
+if debug == 'true':
+    print(commandMap)
 
 parser = Parser(manager_name)
 tokens = parser.ParseMap(commandMap)
-#print(json.dumps(tokens, indent=2))
-#print(parser.getCommandMap())
+
+if debug == 'true':
+    print(json.dumps(tokens, indent=2))
+    print(parser.getCommandMap())
 
 funktionManager = SetManager()
 
@@ -41,10 +49,11 @@ interaptor = Interaptor(funktionManager, manager_name, mode)
 
 f = funktionManager.getByName(manager_name)
 
-for i in range(4, len(sys.argv), 2):
+for i in range(5, len(sys.argv), 2):
     f.createNewVar(sys.argv[i], sys.argv[i+1])
 
 interaptor.interapt(tokens)
 
-#print(json.dumps(f.VarList, indent=2))
-#print(json.dumps(f.ArrayList, indent=2))
+if debug == 'true':
+    print(json.dumps(f.VarList, indent=2))
+    print(json.dumps(f.ArrayList, indent=2))

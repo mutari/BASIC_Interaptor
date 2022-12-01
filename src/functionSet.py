@@ -82,7 +82,17 @@ class FunctionSet:
         elif operator == "NEQ":
             operator = "!="
 
-        return eval("\"" + str(value1) + "\" " + str(operator) + " \"" + str(value2) + "\"")
+        if not self.isNumber(value1):
+            value1 = "\"" + str(value1) + "\""
+        else:
+            value1 = str(value1)
+
+        if not self.isNumber(value2):
+            value2 = "\"" + str(value2) + "\""
+        else:
+            value2 = str(value2)
+
+        return eval(value1 + " " + str(operator) + " " + value2)
 
     def FOR(self, data, rowIndex):
         keyTO = self.getKeyOf(data, "TO")
@@ -123,6 +133,13 @@ class FunctionSet:
             return None
         self.uppdateVar(loop["var"]["value"], int(value["value"]) + int(loop["step"]))
         return loop["row"]
+
+    def LOAD(self, data):
+        name = list(data.items())[0][1]['value']
+        if name == "NOW":
+            self.createNewVar(name, int(time.time() * 1000000))
+        elif name == "SEC":
+            self.createNewVar(name, int(time.time()))
 
     def NAMESPACE(self, tokens):
         namespace = self.advancedEval(tokens)
@@ -281,6 +298,12 @@ class FunctionSet:
                     out += "-"
                 elif value == "MULTIPLIKATION":
                     out += "*"
+                elif value == "SLASH":
+                    out += "/"
+                elif value == "LEFTPARENTHESIS":
+                    out += "("
+                elif value == "RIGHTPARENTHESIS":
+                    out += ")"
             else:
                 return False
 

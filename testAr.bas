@@ -27,13 +27,14 @@
 2070 LET Y = 1
 2080 LET Z = N
 2090 GOTO 2110
-2100 IF A[X] < A[X-1] THEN GOTO 2170
+2100 IF X < 10 THEN GOTO 2101 ELSE GOTO 2170
+2101 IF A[X] < A[X - 1] THEN GOTO 2170
 2110 B[Y] = A[X]
 2120 LET Y = Y + 1
 2130 LET X = X + 1 
 2140 IF Z < Y THEN GOTO 2200
 2150 GOTO 2100
-2160 IF A[X] < A[X-1] THEN GOTO 2110
+2160 IF A[X] < A[X - 1] THEN GOTO 2110
 2170 LET B[Z] = A[X]
 2180 LET Z = Z - 1
 2190 LET X = X + 1 
@@ -52,12 +53,12 @@
 2390 REM Check if the loop is done
 2400 IF Z < Y THEN GOTO 2560
 2410 REM If both items are smaller then start over with the smallest
-2420 IF B[Y] >= A[X-1] OR B[Z] >= A[X-1] THEN GOTO 2450
+2420 IF B[Y] >= A[X - 1] OR B[Z] >= A[X - 1] THEN GOTO 2450
 2430 LET Q = 0
 2440 GOTO 2370
 2450 REM Pick the smallest item that represents an increase
-2460 IF B[Z] < B[Y] AND B[Z] >= A[X-1] THEN GOTO 2520
-2470 IF B[Z] > B[Y] AND B[Y] < A[X-1] THEN GOTO 2520
+2460 IF B[Z] < B[Y] AND B[Z] >= A[X - 1] THEN GOTO 2520
+2470 IF B[Z] > B[Y] AND B[Y] < A[X - 1] THEN GOTO 2520
 2480 LET A[X] = B[Y]
 2490 LET Y = Y + 1
 2500 LET X = X + 1

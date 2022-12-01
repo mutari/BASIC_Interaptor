@@ -116,8 +116,20 @@ class Parser:
                     rowTokens[index] = self.addTokenObjekt("OPERATOR", "MULTIPLIKATION")
                     cmd = ""
                     index += 1
+                elif cmd == "/":
+                    rowTokens[index] = self.addTokenObjekt("OPERATOR", "SLASH")
+                    cmd = ""
+                    index += 1
                 elif cmd == ",":
                     rowTokens[index] = self.addTokenObjekt("OPERATOR", "COMMA")
+                    cmd = ""
+                    index += 1
+                elif cmd == "(":
+                    rowTokens[index] = self.addTokenObjekt("OPERATOR", "LEFTPARENTHESIS")
+                    cmd = ""
+                    index += 1
+                elif cmd == ")":
+                    rowTokens[index] = self.addTokenObjekt("OPERATOR", "RIGHTPARENTHESIS")
                     cmd = ""
                     index += 1
                 elif cmd == "[":
@@ -192,6 +204,10 @@ class Parser:
                     index += 1
                 elif cmd == "NAMESPACE" and self.getNext(chars, c+1) == " ":
                     rowTokens[index] = self.addTokenObjekt("STATIC", "NAMESPACE")
+                    cmd = ""
+                    index += 1
+                elif cmd == "LOAD" and self.getNext(chars, c+1) == " ":
+                    rowTokens[index] = self.addTokenObjekt("STATIC", "LOAD")
                     cmd = ""
                     index += 1
                 elif cmd == "IMPORT" and self.getNext(chars, c+1) == " ":

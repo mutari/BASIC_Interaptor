@@ -12,7 +12,7 @@
 2100 OUT = OUT + "(" + N + ")" + F[N] + ", "
 2090 LET N = N + 1
 2110 REM Stop after printing  50 numbers
-2120 IF N < 50 THEN GOTO 2080
+2120 IF N <= 50 THEN GOTO 2080
 2125 PRINT N
 2130 PRINT OUT
 

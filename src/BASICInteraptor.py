@@ -10,10 +10,11 @@ import traceback
 # END
 # GOTO
 # GOSUB ... RETURN
-# PAUSE
+# PAUSE (integer)
 # IF ... THEN
 # IF ... THEN ... ELSE
 # FOR ... TO ... STEP ... NEXT
+# LOAD [NOW, SEC]
 
 # To Do
 # NAMESPACE
@@ -133,6 +134,8 @@ class Interaptor:
                         continue
                     elif Checking["value"] == "NAMESPACE":
                         self.functions.NAMESPACE(self.slice(tokens[codeIndex], 1))
+                    elif Checking["value"] == "LOAD":
+                        self.functions.LOAD(self.slice(tokens[codeIndex], 1))
                     elif Checking["value"] == "IMPORT":
                         path = self.slice(tokens[codeIndex], 1, self.getIndexOf(tokens[codeIndex], "AS"))
                         importVar = self.slice(tokens[codeIndex], self.getIndexOf(tokens[codeIndex], "AS") + 1)
