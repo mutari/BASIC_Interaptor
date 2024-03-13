@@ -165,21 +165,20 @@ class Parser:
                     index += 1
                     cmd = ""
 
-                elif cmd == "REM" and (
-                        get_next(chars, c + 1) == " " or
-                        get_next(chars, c + 1) == "\n"):  # if its a note then it just hops ower it
+                elif cmd == "REM" and get_next(chars, c + 1) in self.INVISIBLE_CHAR_LIST:
+                    # if it's a comment then it just skips it
                     row_tokens[index] = get_token_object("STATIC", "REM")
                     break
-                elif cmd == "FALSE" and (get_next(chars, c + 1) == " " or get_next(chars, c + 1) == "\n"):
+                elif cmd == "FALSE" and get_next(chars, c + 1) in self.INVISIBLE_CHAR_LIST:
                     row_tokens[index] = get_token_object("BOOLEAN", "FALSE")
                     index += 1
                     cmd = ""
-                elif cmd == "TRUE" and (get_next(chars, c + 1) == " " or get_next(chars, c + 1) == "\n"):
+                elif cmd == "TRUE" and get_next(chars, c + 1) in self.INVISIBLE_CHAR_LIST:
                     row_tokens[index] = get_token_object("BOOLEAN", "TRUE")
                     index += 1
                     cmd = ""
 
-                elif cmd.isalpha() and cmd in self.KEYWORDS_LIST and get_next(chars, c + 1) in [" ", "\n"]:
+                elif cmd.isalpha() and cmd in self.KEYWORDS_LIST and get_next(chars, c + 1) in self.INVISIBLE_CHAR_LIST:
                     row_tokens[index] = get_token_object("STATIC", cmd)
                     index += 1
                     cmd = ""
