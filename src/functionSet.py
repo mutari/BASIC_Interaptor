@@ -1,8 +1,9 @@
 import time
-from helpFunctions import getFileInput, createHashMap
+from helpFunctions import get_file_input, create_hash_map
+
 
 class FunctionSet:
-    
+
     def __init__(self, threadname, mode):
         self.name = threadname
         self.VarList = []
@@ -12,7 +13,7 @@ class FunctionSet:
         self.namespace = ""
         self.mode = mode
 
-    #basic static functions
+    # basic static functions
     def PRINT(self, tokens):
         str = self.advancedEval(tokens)
         self.basicPrint(str)
@@ -27,7 +28,7 @@ class FunctionSet:
         array = self.getArrayByName(name)
         key = self.generateArrayKeys(data)
 
-        #test if the right amount of array keys
+        # test if the right amount of array keys
         if key["keysFound"] > int(array["dimension"]):
             print("to meny keys" + str(key) + " array: " + str(array))
             exit(1)
@@ -36,7 +37,7 @@ class FunctionSet:
             exit(1)
 
         if data[list(data.items())[key["endOfKeys"]][0]]["value"] == "EQ":
-            data = self.slice(data, key["endOfKeys"]+1)
+            data = self.slice(data, key["endOfKeys"] + 1)
             value = self.advancedEval(data)
             self.uppdateArray(name, key["keys"], value)
 
@@ -56,7 +57,7 @@ class FunctionSet:
 
     def RETURN(self):
         try:
-            return self.OldIndexes.pop(len(self.OldIndexes)-1)
+            return self.OldIndexes.pop(len(self.OldIndexes) - 1)
         except:
             return None
 
@@ -67,7 +68,7 @@ class FunctionSet:
     def IF(self, case):
         opeIndex = list(case.items())[self.getKeyOf(case, "BOOLEANSKOP", "type")][0]
         operator = case[opeIndex]["value"]
-        value1 = self.advancedEval(self.slice(case, 0, opeIndex-1))
+        value1 = self.advancedEval(self.slice(case, 0, opeIndex - 1))
         value2 = self.advancedEval(self.slice(case, opeIndex))
         if operator == "EQEQ":
             operator = "=="
@@ -82,12 +83,12 @@ class FunctionSet:
         elif operator == "NEQ":
             operator = "!="
 
-        if not self.isNumber(value1):
+        if not self.is_number(value1):
             value1 = "\"" + str(value1) + "\""
         else:
             value1 = str(value1)
 
-        if not self.isNumber(value2):
+        if not self.is_number(value2):
             value2 = "\"" + str(value2) + "\""
         else:
             value2 = str(value2)
@@ -102,7 +103,7 @@ class FunctionSet:
         var = self.slice(data, 0, keyTO)
         keys = list(data.items())
         varName = var[1]
-        if(var[2]["value"] == "EQ"):
+        if (var[2]["value"] == "EQ"):
             self.LET(varName, self.slice(var, 2))
         else:
             print("Error interaptor: missing EQ when declearing var")
@@ -110,7 +111,7 @@ class FunctionSet:
 
         goal = None
         step = None
-        if(keySTEP):
+        if (keySTEP):
             goal = self.slice(data, keyTO, keySTEP)
             step = self.slice(data, keySTEP + 1)
             step = self.advancedEval(step)
@@ -129,7 +130,7 @@ class FunctionSet:
         value = self.getVarByName(loop["var"]["value"])
         if int(value["value"]) + int(loop['step']) >= int(loop["goal"]):
             self.forLoop.pop(len(self.forLoop) - 1)
-            self.uppdateVar(loop["var"]["value"], "None") # borde ändra till att döda variablen
+            self.uppdateVar(loop["var"]["value"], "None")  # borde ändra till att döda variablen
             return None
         self.uppdateVar(loop["var"]["value"], int(value["value"]) + int(loop["step"]))
         return loop["row"]
@@ -147,16 +148,11 @@ class FunctionSet:
 
     def IMPORT(self, path, importVar):
 
-        commandList = getFileInput(path)
+        commandList = get_file_input(path)
         print(commandList)
-        
-
-
-
-
 
         print(path, importVar)
-        
+
     def DISPLAY(self, width, height, boolean):
         width = self.advancedEval(width)
         height = self.advancedEval(height)
@@ -168,11 +164,11 @@ class FunctionSet:
         var = self.getVarByName(data[1]["value"])
         print("exp:" + str(var["name"]) + ":" + str(var["value"]))
 
-    #var functions
+    # var functions
     def getVarByName(self, name):
         name = self.getNamespace(name);
         for var in self.VarList:
-            if var["name"] == name :
+            if var["name"] == name:
                 return var
         print("Error: array whit name: " + str(name) + " is not deklarerad ")
         exit(1)
@@ -180,18 +176,18 @@ class FunctionSet:
     def createNewVar(self, name, value):
         name = self.getNamespace(name);
         for var in self.VarList:
-            if var["name"] == name: 
-                var["value"] = value #if var exists overide it
+            if var["name"] == name:
+                var["value"] = value  # if var exists overide it
                 return
         self.VarList.append({"name": name, "value": value})
-        #print(self.VarList)
+        # print(self.VarList)
 
     def uppdateVar(self, name, value):
         name = self.getNamespace(name);
         var = self.getVarByName(name)
         var["value"] = value
 
-    #array functions
+    # array functions
     def getArrayByName(self, name):
         name = self.getNamespace(name);
         for array in self.ArrayList:
@@ -207,7 +203,7 @@ class FunctionSet:
     def uppdateArray(self, name, keys, value):
         array = self.getArrayByName(name)
         array["value_list"][keys] = value
-    
+
     def getNamespace(self, name):
         if len(name.split('@')) > 1:
             return name
@@ -217,7 +213,7 @@ class FunctionSet:
 
     def generateArrayKeys(self, data):
         keys = ""
-        #get the arraý keys
+        # get the arraý keys
         endOfKeys = -1
         keysfound = 0
         exp = False
@@ -235,15 +231,15 @@ class FunctionSet:
                     keys += str(self.advancedEval(expObj))
                 expObj = {}
                 exp = False
-                if c+1 >= len(data) + list(data.items())[0][0]:
-                    endOfKeys = c - (int(list(data.items())[0][0])-1)
+                if c + 1 >= len(data) + list(data.items())[0][0]:
+                    endOfKeys = c - (int(list(data.items())[0][0]) - 1)
                     break
-                elif data[c+1]["value"] != "LEFTBLOCK":
-                    endOfKeys = c - (int(list(data.items())[0][0])-1)
+                elif data[c + 1]["value"] != "LEFTBLOCK":
+                    endOfKeys = c - (int(list(data.items())[0][0]) - 1)
                     break
                 else:
-                    continue 
-            # rewrite to suport advancedEval
+                    continue
+                    # rewrite to suport advancedEval
             elif exp:
                 expObj[c] = data[c]
             else:
@@ -251,21 +247,20 @@ class FunctionSet:
                 exit
         return {"endOfKeys": endOfKeys, "keysFound": keysfound, "keys": keys}
 
-
-    #bas functions
+    # bas functions
     def getName(self):
         return self.name
-    
-    #omvandlar variablar till des värde
+
+    # omvandlar variablar till des värde
     def translate(self, input):
         out = {}
         it = iter(range(0, len(input)))
         for c in it:
-            #list(input.items())[0][0] gets the first key of the dic
+            # list(input.items())[0][0] gets the first key of the dic
             token = input[c + list(input.items())[0][0]]
             if token["type"] == "VAR":
                 value = self.getVarByName(token["value"])["value"]
-                if self.isNumber(value):
+                if self.is_number(value):
                     out[c] = ({"type": "NUM", "value": value})
                 else:
                     out[c] = ({"type": "STR", "value": value})
@@ -274,7 +269,7 @@ class FunctionSet:
                 for j in range(0, key["endOfKeys"]):
                     next(it)
                 value = self.getArrayByName(token["value"])["value_list"][key["keys"]]
-                if self.isNumber(value):
+                if self.is_number(value):
                     out[c] = ({"type": "NUM", "value": value})
                 else:
                     out[c] = ({"type": "STR", "value": value})
@@ -282,13 +277,13 @@ class FunctionSet:
                 out[c] = (token)
         return out
 
-    #evulerar utan sträng
+    # evulerar utan sträng
     def evalNum(self, input):
         out = ""
         for c in input:
             value = input[c]["value"]
             key = input[c]["type"]
-            #print(self.VarList)
+            # print(self.VarList)
             if key == "NUM":
                 out += str(value)
             elif key == "OPERATOR":
@@ -309,15 +304,15 @@ class FunctionSet:
 
         return eval(out)
 
-    #evulerar med sträng
+    # evulerar med sträng
     def evalStr(self, input):
         out = ""
-        #change all loops to while loops
-        
+        # change all loops to while loops
+
         i = 0
         while i < len(input):
             token = input[list(input.items())[i][0]]
-            if i % 2 == 0 : #if first item
+            if i % 2 == 0:  # if first item
                 if token["type"] == "STR":
                     out += str(token["value"])
                 elif token["type"] == "NUM":
@@ -332,30 +327,30 @@ class FunctionSet:
 
         return out
 
-    def isNumber(self, char):
+    def is_number(self, char):
         return str(char).isdecimal()
 
-    def basicPrint(self, value): 
+    def basicPrint(self, value):
         print(value)
 
     def basicInput(self, text):
         return input(text)
 
     def advancedEval(self, value):
-        #translates all the variabels to ther value
+        # translates all the variabels to ther value
         trans = self.translate(value)
-        
-        #returns False if the value have a char that is not a number
+
+        # returns False if the value have a char that is not a number
         res = self.evalNum(trans)
         if res is False:
-            #if value is not a string
+            # if value is not a string
             res = self.evalStr(trans)
         return res
 
-    def slice(self, dic, start, end = None):
+    def slice(self, dic, start, end=None):
         return dict(list(dic.items())[start:end])
 
-    def getKeyOf(self, data, val, index = "value"):
+    def getKeyOf(self, data, val, index="value"):
         i = 0
         while i < len(data):
             if data[list(data.items())[i][0]][index] == val:

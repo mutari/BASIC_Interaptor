@@ -3,7 +3,7 @@ import sys
 from BASICParser import Parser
 from BASICInteraptor import Interaptor
 from setManager import SetManager
-from helpFunctions import getFileInput, createHashMap
+from helpFunctions import get_file_input, create_hash_map
 
 commandList = []
 commandMap = {}
@@ -30,27 +30,27 @@ if len(sys.argv) > 4:
 else:
     debug = "false"
 
-commandList = getFileInput(script)
+commandList = get_file_input(script)
 
-commandMap = createHashMap(commandList)
+commandMap = create_hash_map(commandList)
 if debug == 'true':
     print(commandMap)
 
 parser = Parser(manager_name)
-tokens = parser.ParseMap(commandMap)
+tokens = parser.parse_map(commandMap)
 
 if debug == 'true':
     print(json.dumps(tokens, indent=2))
-    print(parser.getCommandMap())
+    print(parser.get_command_map())
 
 funktionManager = SetManager()
 
 interaptor = Interaptor(funktionManager, manager_name, mode)
 
-f = funktionManager.getByName(manager_name)
+f = funktionManager.get_by_name(manager_name)
 
 for i in range(5, len(sys.argv), 2):
-    f.createNewVar(sys.argv[i], sys.argv[i+1])
+    f.createNewVar(sys.argv[i], sys.argv[i + 1])
 
 interaptor.interapt(tokens)
 

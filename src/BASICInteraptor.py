@@ -2,6 +2,7 @@ from functionSet import FunctionSet
 import itertools
 import traceback
 
+
 # I Think Working
 # PRINT
 # LET
@@ -41,42 +42,40 @@ import traceback
 # GETCLICK()
 
 class Interaptor:
-
     STATIC = "STATIC"
     VARARRAY = "VARARRAY"
     VAR = "VAR"
 
-
-    def __init__(self, setManager, functionSetName, mode, new = True):
+    def __init__(self, setManager, functionSetName, mode, new=True):
         self.rowIndex = 0
         self.new = new
         self.mode = mode
         if new:
             self.functions = FunctionSet(functionSetName, mode)
             self.manager = setManager
-            self.manager.addSet(self.functions)
+            self.manager.add_set(self.functions)
         else:
             self.manager = setManager
-            self.functions = self.manager.getByName(functionSetName)
+            self.functions = self.manager.get_by_name(functionSetName)
 
-    def moveCodeIndex(self, tokens, index = 0):
+    def moveCodeIndex(self, tokens, index=0):
         temp = list(tokens.keys())[index]
         self.rowIndex = index + 1
         return temp
 
     def interapt(self, tokens):
-        
+
         try:
             codeIndex = self.moveCodeIndex(tokens, self.rowIndex)
 
-            while(True):
-                #print(tokens)
-                #print("test: " + str(self.rowIndex))
-                #print(codeIndex)
+            while (True):
+                # print(tokens)
+                # print("test: " + str(self.rowIndex))
+                # print(codeIndex)
 
-                #code index is the row number
-                #it = iter(range(0, len(tokens[codeIndex])))
-                #for c in it:
+                # code index is the row number
+                # it = iter(range(0, len(tokens[codeIndex])))
+                # for c in it:
                 # c is the index of the pecefic token in the row 
                 if len(list(tokens[codeIndex].items())) <= 0:
                     print("Syntax error row: " + str(codeIndex))
@@ -85,37 +84,37 @@ class Interaptor:
                 Checking = tokens[codeIndex][c]
 
                 if Checking["type"] == Interaptor.STATIC:
-                    #check is the command starts white a static key name
+                    # check is the command starts white a static key name
                     if Checking["value"] == "REM":
-                        if(self.rowIndex < len(tokens)):
+                        if (self.rowIndex < len(tokens)):
                             codeIndex = self.moveCodeIndex(tokens, self.rowIndex)
-                        else: 
+                        else:
                             break
                         continue
                     if Checking["value"] == "PRINT":
-                        #print("PRINT:::: " + str(tokens[codeIndex]))
+                        # print("PRINT:::: " + str(tokens[codeIndex]))
                         self.functions.PRINT(self.slice(tokens[codeIndex], 1))
                     elif Checking["value"] == "LET":
-                        #print("LET:::: " + str(tokens[codeIndex]))
-                        varName = tokens[codeIndex][c+1]
-                        if(tokens[codeIndex][c+2]["value"] == "EQ"):
-                            #print(self.slice(tokens[codeIndex], 3))
+                        # print("LET:::: " + str(tokens[codeIndex]))
+                        varName = tokens[codeIndex][c + 1]
+                        if (tokens[codeIndex][c + 2]["value"] == "EQ"):
+                            # print(self.slice(tokens[codeIndex], 3))
                             self.functions.LET(varName, self.slice(tokens[codeIndex], 3))
                         else:
                             print("Let error: " + str(Checking) + " row(" + codeIndex + ")")
                             exit(1)
                     elif Checking["value"] == "ARRAY":
-                        arrayName = tokens[codeIndex][c+1]
+                        arrayName = tokens[codeIndex][c + 1]
                         arrayDim = 1
-                        #print("Array name: " + str(arrayName["value"])) 
-                        if c+2 < len(tokens[codeIndex]) and tokens[codeIndex][c+2]["value"] == "COMMA":
-                            arrayDim = tokens[codeIndex][c+3]["value"]
+                        # print("Array name: " + str(arrayName["value"]))
+                        if c + 2 < len(tokens[codeIndex]) and tokens[codeIndex][c + 2]["value"] == "COMMA":
+                            arrayDim = tokens[codeIndex][c + 3]["value"]
                         self.functions.ARRAY_CREATE(arrayName, arrayDim)
                     elif Checking["value"] == "INPUT":
                         data = self.slice(tokens[codeIndex], 1)
                         index = self.getIndexOf(data, "APPOSTROF")
                         text = self.slice(data, 0, index)
-                        varName = data[list(self.slice(data, index+1).items())[0][0]]
+                        varName = data[list(self.slice(data, index + 1).items())[0][0]]
                         self.functions.INPUT(varName, text)
                     elif Checking["value"] == "END":
                         print("The Script Whs Terminated(row: " + codeIndex + ")")
@@ -123,13 +122,13 @@ class Interaptor:
                     elif Checking["value"] == "GOTO":
                         number = self.functions.GOTO(self.slice(tokens[codeIndex], 1))
                         if self.new == False:
-                            return number 
+                            return number
                         codeIndex = self.moveCodeIndex(tokens, self.findRowIndexByKey(tokens, number))
                         continue
                     elif Checking["value"] == "GOSUB":
                         number = self.functions.GOSUB(self.slice(tokens[codeIndex], 1), codeIndex)
                         if self.new == False:
-                            return number 
+                            return number
                         codeIndex = self.moveCodeIndex(tokens, self.findRowIndexByKey(tokens, number))
                         continue
                     elif Checking["value"] == "NAMESPACE":
@@ -151,30 +150,33 @@ class Interaptor:
                         self.functions.PAUSE(self.slice(tokens[codeIndex], 1))
                     elif Checking["value"] == "IF":
                         statement = self.slice(tokens[codeIndex], 1, self.getIndexOf(tokens[codeIndex], "THEN"))
-                        code = self.slice(tokens[codeIndex], self.getIndexOf(tokens[codeIndex], "THEN")+1, self.getIndexOf(tokens[codeIndex], "ELSE"))
-                        #print(self.functions.IF(statement))
+                        code = self.slice(tokens[codeIndex], self.getIndexOf(tokens[codeIndex], "THEN") + 1,
+                                          self.getIndexOf(tokens[codeIndex], "ELSE"))
+                        # print(self.functions.IF(statement))
                         if self.functions.IF(statement):
                             row = {}
-                            #print("tokens: " + str(tokens[codeIndex]))
-                            rowKey = list(tokens.keys())[self.rowIndex-1]
+                            # print("tokens: " + str(tokens[codeIndex]))
+                            rowKey = list(tokens.keys())[self.rowIndex - 1]
                             row[rowKey] = code
-                            #print(row)
-                            #create a new interaptor white the same functionset
+                            # print(row)
+                            # create a new interaptor white the same functionset
                             number = Interaptor(self.manager, self.functions.name, self.mode, False).interapt(row)
-                            if number: 
+                            if number:
                                 codeIndex = self.moveCodeIndex(tokens, self.findRowIndexByKey(tokens, number))
                                 continue
                         elif self.getIndexOf(tokens[codeIndex], "ELSE") != None:
-                            alternativCode = self.slice(tokens[codeIndex], self.getIndexOf(tokens[codeIndex], "ELSE")+1)
+                            alternativCode = self.slice(tokens[codeIndex],
+                                                        self.getIndexOf(tokens[codeIndex], "ELSE") + 1)
                             row = {}
-                            #print("tokens: " + str(alternativCode))
-                            rowKey = list(tokens.keys())[self.rowIndex-1]
+                            # print("tokens: " + str(alternativCode))
+                            rowKey = list(tokens.keys())[self.rowIndex - 1]
                             row[rowKey] = alternativCode
-                            #print(row)
-                            #create a new interaptor white the same functionset
+                            # print(row)
+                            # create a new interaptor white the same functionset
                             number = Interaptor(self.manager, self.functions.name, self.mode, False).interapt(row)
-                            if number: 
-                                codeIndex = self.moveCodeIndex(tokens, self.findRowIndexByKey(tokens, number)) # GoTO/GoSub returenrar row number
+                            if number:
+                                codeIndex = self.moveCodeIndex(tokens, self.findRowIndexByKey(tokens,
+                                                                                              number))  # GoTO/GoSub returenrar row number
                                 continue
                     elif Checking["value"] == "DISPLAY":
                         data = self.slice(tokens[codeIndex], 1)
@@ -200,37 +202,36 @@ class Interaptor:
                         exit(1)
                 elif Checking["type"] == Interaptor.VARARRAY:
                     arrayName = Checking["value"]
-                    #print(tokens[codeIndex])
+                    # print(tokens[codeIndex])
                     keys = self.slice(tokens[codeIndex], 1)
-                    #print("keys: " + str(keys))
+                    # print("keys: " + str(keys))
                     self.functions.ARRAY_UPPDATE(arrayName, keys)
                 elif Checking["type"] == Interaptor.VAR:
-                    if(tokens[codeIndex][c+1]["value"] == "EQ"):
-                        #print(self.slice(tokens[codeIndex], 3))
+                    if (tokens[codeIndex][c + 1]["value"] == "EQ"):
+                        # print(self.slice(tokens[codeIndex], 3))
                         self.functions.LET(Checking, self.slice(tokens[codeIndex], 2))
                     else:
                         print("Error type: " + str(Checking) + " row(" + codeIndex + ")")
                         exit(1)
 
-                #print(tokens[codeIndex][c]["value"])
+                # print(tokens[codeIndex][c]["value"])
 
-                #move tokens list forward
-                if(self.rowIndex < len(tokens)):
+                # move tokens list forward
+                if (self.rowIndex < len(tokens)):
                     codeIndex = self.moveCodeIndex(tokens, self.rowIndex)
-                else: 
+                else:
                     break
         except Exception as e:
             print(self.mode)
             if self.mode == 'dev':
-                print("An exception occurred: ", str(traceback.print_exc())) 
-            else: 
-                print("Error: " + str(Checking) + " row(" + codeIndex + ")")
+                print("An exception occurred: ", str(traceback.print_exc()))
+            else:
+                print(f"""Error: {str(Checking)} row({codeIndex})""")
 
-    
-    def slice(self, dic, start, end = None):
+    def slice(self, dic, start, end=None):
         return dict(list(dic.items())[start:end])
 
-    def getIndexOf(self, data, val, index = "value"):
+    def getIndexOf(self, data, val, index="value"):
         i = 0
         while i < len(data):
             if data[list(data.items())[i][0]][index] == val:
@@ -246,6 +247,3 @@ class Interaptor:
                 return i
             i += 1
         return None
-
-
-

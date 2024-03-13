@@ -1,338 +1,206 @@
-import re
+def get_token_object(t, v):
+    return {"type": t, "value": v}
 
-# >=, <=, >, <, ==
+
+def split(word):
+    return [char for char in word]
+
+
+def get_next(chars, index):
+    if len(chars) > index:
+        return chars[index]
+    return -1
+
 
 class Parser:
+    INVISIBLE_CHAR_LIST = [" ", "\t", "\n"]
+
+    KEYWORDS_LIST = ["PRINT", "LET", "GOTO", "ARRAY", "INPUT", "END", "IF", "THEN", "ELSE", "FOR", "TO",
+                     "STEP", "NEXT", "GOSUB", "NAMESPACE", "LOAD", "IMPORT", "AS", "RETURN", "PLOT",
+                     "DISPLAY", "DRAW", "TEXT", "PAUSE", "EXPORT", "CLS", "CLT", "CLC", "REM", "FALSE", "TRUE"]
+
+    OPERATORS_DICT = {
+        '=': "OPERATOR", '<': "BOOLEANSKOP", '>': "BOOLEANSKOP", '!=': "BOOLEANSKOP", '+': "OPERATOR",
+        '-': "OPERATOR", '*': "OPERATOR", '/': "OPERATOR", ',': "OPERATOR", '(': "OPERATOR", ')': "OPERATOR",
+        '[': "OPERATOR", ']': "OPERATOR", ';': "OPERATOR"}
 
     def __init__(self, mode):
         self.CommandMap = {}
 
-    def ParseMap(self, cm): 
+    def parse_map(self, cm):
         self.CommandMap = cm
 
-        Tokens = {}
+        tokens = {}
 
         for key in self.CommandMap:
-            rowTokens = {}
-            #print(": " + self.CommandMap[key])
-            #print("- " + key)
-            chars = self.split(self.CommandMap[key])
+            row_tokens = {}
+            # print(": " + self.CommandMap[key])
+            # print("- " + key)
+            chars = split(self.CommandMap[key])
             cmd = ""
             index = 0
-            
+
             string = ""
-            IsString = 0
+            is_string = False
 
             number = ""
-            IsNumber = 0
+            is_number = False
 
             it = iter(range(0, len(chars)))
 
             for c in it:
                 cmd += chars[c]
-                #print(cmd)
-                
-                #fi the parser have fin a string
-                if IsString == 1:
-                    if cmd != "\"": 
+                # print(cmd)
+
+                # if the parser have found a string
+                if is_string:
+                    if cmd != "\"":
                         string += cmd
                         cmd = ""
-                    else: # end of string
-                        rowTokens[index] = self.addTokenObjekt("STR", string)
+                    else:  # end of string
+                        row_tokens[index] = get_token_object("STR", string)
                         string = ""
                         cmd = ""
-                        IsString = 0
+                        is_string = False
                         index += 1
-                #if the parser have find a number
-                if IsNumber == 1:
-                    if self.isNumber(cmd) == 1:
+
+                # if the parser have found a number
+                if is_number:
+                    if cmd.isdigit():
                         number += cmd
                         cmd = ""
-                        if self.isNumber(chars[c+1]) == 0:
-                            #print("test")
-                            rowTokens[index] = self.addTokenObjekt("NUM", number)
+                        if not chars[c + 1].isdigit():
+                            row_tokens[index] = get_token_object("NUM", number)
                             number = ""
-                            IsNumber = 0
+                            is_number = False
                             index += 1
                     else:
-                        return {"error": "could not work out a number row: " + key}
+                        return {"error": f"""could not work out a number row: {key}"""}
 
-                elif cmd == " " or cmd == "\t" or cmd == "\n": # make the candy go away
+                elif cmd in self.INVISIBLE_CHAR_LIST:  # make the candy go away
                     cmd = ""
-                elif cmd == "\"": # start of string 
-                    IsString = 1
+                elif cmd == "\"":  # start of string 
+                    is_string = True
                     cmd = ""
-                
-                #start of a number
-                elif self.isNumber(cmd) == 1:
+
+                # start of a number
+                elif cmd.isdigit():
                     number += cmd
-                    IsNumber = 1
+                    is_number = True
                     cmd = ""
-                    if self.isNumber(chars[c+1]) == 0:
-                            #print("test")
-                            rowTokens[index] = self.addTokenObjekt("NUM", number)
-                            number = ""
-                            IsNumber = 0
-                            index += 1
-                
-                #test of operations
+                    if not chars[c + 1].isdigit():
+                        # print("test")
+                        row_tokens[index] = get_token_object("NUM", number)
+                        number = ""
+                        is_number = False
+                        index += 1
+
+                # test of operations
                 elif cmd == "=":
-                    if chars[c+1] != "=":
-                        rowTokens[index] = self.addTokenObjekt("OPERATOR", "EQ")
+                    if chars[c + 1] != "=":
+                        row_tokens[index] = get_token_object("OPERATOR", "EQ")
                     else:
-                        rowTokens[index] = self.addTokenObjekt("BOOLEANSKOP", "EQEQ")
+                        row_tokens[index] = get_token_object("BOOLEANSKOP", "EQEQ")
                         next(it)
-                    cmd = ""
                     index += 1
+                    cmd = ""
                 elif cmd == "<":
-                    if chars[c+1] != "=":
-                        rowTokens[index] = self.addTokenObjekt("BOOLEANSKOP", "LT")
+                    if chars[c + 1] != "=":
+                        row_tokens[index] = get_token_object("BOOLEANSKOP", "LT")
                     else:
-                        rowTokens[index] = self.addTokenObjekt("BOOLEANSKOP", "LTEQ")
+                        row_tokens[index] = get_token_object("BOOLEANSKOP", "LTEQ")
                         next(it)
-                    cmd = ""
                     index += 1
+                    cmd = ""
                 elif cmd == ">":
-                    if chars[c+1] != "=":
-                        rowTokens[index] = self.addTokenObjekt("BOOLEANSKOP", "MT")
+                    if chars[c + 1] != "=":
+                        row_tokens[index] = get_token_object("BOOLEANSKOP", "MT")
                     else:
-                        rowTokens[index] = self.addTokenObjekt("BOOLEANSKOP", "MTEQ")
+                        row_tokens[index] = get_token_object("BOOLEANSKOP", "MTEQ")
                         next(it)
-                    cmd = ""
                     index += 1
+                    cmd = ""
                 elif cmd == "!=":
-                    rowTokens[index] = self.addTokenObjekt("BOOLEANSKOP", "NEQ")
-                    cmd = ""
+                    row_tokens[index] = get_token_object("BOOLEANSKOP", "NEQ")
                     index += 1
+                    cmd = ""
                 elif cmd == "+":
-                    rowTokens[index] = self.addTokenObjekt("OPERATOR", "PLUS")
-                    cmd = ""
+                    row_tokens[index] = get_token_object("OPERATOR", "PLUS")
                     index += 1
+                    cmd = ""
                 elif cmd == "-":
-                    rowTokens[index] = self.addTokenObjekt("OPERATOR", "MINUS")
-                    cmd = ""
+                    row_tokens[index] = get_token_object("OPERATOR", "MINUS")
                     index += 1
+                    cmd = ""
                 elif cmd == "*":
-                    rowTokens[index] = self.addTokenObjekt("OPERATOR", "MULTIPLIKATION")
-                    cmd = ""
+                    row_tokens[index] = get_token_object("OPERATOR", "MULTIPLIKATION")
                     index += 1
+                    cmd = ""
                 elif cmd == "/":
-                    rowTokens[index] = self.addTokenObjekt("OPERATOR", "SLASH")
-                    cmd = ""
+                    row_tokens[index] = get_token_object("OPERATOR", "SLASH")
                     index += 1
+                    cmd = ""
                 elif cmd == ",":
-                    rowTokens[index] = self.addTokenObjekt("OPERATOR", "COMMA")
-                    cmd = ""
+                    row_tokens[index] = get_token_object("OPERATOR", "COMMA")
                     index += 1
+                    cmd = ""
                 elif cmd == "(":
-                    rowTokens[index] = self.addTokenObjekt("OPERATOR", "LEFTPARENTHESIS")
-                    cmd = ""
+                    row_tokens[index] = get_token_object("OPERATOR", "LEFTPARENTHESIS")
                     index += 1
+                    cmd = ""
                 elif cmd == ")":
-                    rowTokens[index] = self.addTokenObjekt("OPERATOR", "RIGHTPARENTHESIS")
-                    cmd = ""
+                    row_tokens[index] = get_token_object("OPERATOR", "RIGHTPARENTHESIS")
                     index += 1
+                    cmd = ""
                 elif cmd == "[":
-                    rowTokens[index] = self.addTokenObjekt("OPERATOR", "LEFTBLOCK")
-                    cmd = ""
+                    row_tokens[index] = get_token_object("OPERATOR", "LEFTBLOCK")
                     index += 1
+                    cmd = ""
                 elif cmd == "]":
-                    rowTokens[index] = self.addTokenObjekt("OPERATOR", "RIGHTBLOCK")
-                    cmd = ""
+                    row_tokens[index] = get_token_object("OPERATOR", "RIGHTBLOCK")
                     index += 1
+                    cmd = ""
                 elif cmd == ";":
-                    rowTokens[index] = self.addTokenObjekt("OPERATOR", "APPOSTROF")
-                    cmd = ""
+                    row_tokens[index] = get_token_object("OPERATOR", "APPOSTROF")
                     index += 1
+                    cmd = ""
 
-                #test for static tiped words
-                elif cmd == "PRINT" and self.getNext(chars, c+1) == " ":
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "PRINT")
-                    cmd = ""
-                    index += 1
-                elif cmd == "LET" and self.getNext(chars, c+1) == " ":
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "LET")
-                    cmd = ""
-                    index += 1
-                elif cmd == "GOTO" and self.getNext(chars, c+1) == " ":
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "GOTO")
-                    cmd = ""
-                    index += 1
-                elif cmd == "ARRAY" and self.getNext(chars, c+1) == " ": 
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "ARRAY")
-                    cmd = ""
-                    index += 1
-                elif cmd == "INPUT" and self.getNext(chars, c+1) == " ":
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "INPUT")
-                    cmd = ""
-                    index += 1
-                elif cmd == "END" and (self.getNext(chars, c+1) == " " or self.getNext(chars, c+1) == "\n"):
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "END")
-                    cmd = ""
-                    index += 1
-                elif cmd == "IF" and self.getNext(chars, c+1) == " ":
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "IF")
-                    cmd = ""
-                    index += 1
-                elif cmd == "THEN" and (self.getNext(chars, c+1) == " " or self.getNext(chars, c+1) == "\n"):
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "THEN")
-                    cmd = ""
-                    index += 1
-                elif cmd == "ELSE" and (self.getNext(chars, c+1) == " " or self.getNext(chars, c+1) == "\n"):
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "ELSE")
-                    cmd = ""
-                    index += 1
-                elif cmd == "FOR" and self.getNext(chars, c+1) == " ":
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "FOR")
-                    cmd = ""
-                    index += 1
-                elif cmd == "TO" and self.getNext(chars, c+1) == " ":
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "TO")
-                    cmd = ""
-                    index += 1
-                elif cmd == "STEP" and self.getNext(chars, c+1) == " ":
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "STEP")
-                    cmd = ""
-                    index += 1
-                elif cmd == "NEXT" and self.getNext(chars, c+1) == " ":
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "NEXT")
-                    cmd = ""
-                    index += 1
-                elif cmd == "GOSUB" and self.getNext(chars, c+1) == " ":
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "GOSUB")
-                    cmd = ""
-                    index += 1
-                elif cmd == "NAMESPACE" and self.getNext(chars, c+1) == " ":
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "NAMESPACE")
-                    cmd = ""
-                    index += 1
-                elif cmd == "LOAD" and self.getNext(chars, c+1) == " ":
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "LOAD")
-                    cmd = ""
-                    index += 1
-                elif cmd == "IMPORT" and self.getNext(chars, c+1) == " ":
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "IMPORT")
-                    cmd = ""
-                    index += 1
-                elif cmd == "AS" and self.getNext(chars, c+1) == " ":
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "AS")
-                    cmd = ""
-                    index += 1
-                elif cmd == "RETURN" and (self.getNext(chars, c+1) == " " or self.getNext(chars, c+1) == "\n"):
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "RETURN")
-                    cmd = ""
-                    index += 1
-                elif cmd == "PLOT" and self.getNext(chars, c+1) == " ":
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "PLOT")
-                    cmd = ""
-                    index += 1
-                elif cmd == "DISPLAY" and self.getNext(chars, c+1) == " ":
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "DISPLAY")
-                    cmd = ""
-                    index += 1
-                elif cmd == "DRAW" and self.getNext(chars, c+1) == " ":
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "DRAW")
-                    cmd = ""
-                    index += 1
-                elif cmd == "TEXT" and self.getNext(chars, c+1) == " ":
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "TEXT")
-                    cmd = ""
-                    index += 1
-                elif cmd == "PAUSE" and (self.getNext(chars, c+1) == " " or self.getNext(chars, c+1) == "\n"):
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "PAUSE")
-                    cmd = ""
-                    index += 1
-                elif cmd == "EXPORT" and self.getNext(chars, c+1) == " ":
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "EXPORT")
-                    cmd = ""
-                    index += 1
-                elif cmd == "CLS" and (self.getNext(chars, c+1) == " " or self.getNext(chars, c+1) == "\n"):
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "CLS")
-                    cmd = ""
-                    index += 1
-                elif cmd == "CLT" and (self.getNext(chars, c+1) == " " or self.getNext(chars, c+1) == "\n"):
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "CLT")
-                    cmd = ""
-                    index += 1
-                elif cmd == "CLC" and (self.getNext(chars, c+1) == " " or self.getNext(chars, c+1) == "\n"):
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "CLC")
-                    cmd = ""
-                    index += 1
-                elif cmd == "REM" and (self.getNext(chars, c+1) == " " or self.getNext(chars, c+1) == "\n"): #if its a note then it just hops ower it
-                    rowTokens[index] = self.addTokenObjekt("STATIC", "REM")
-                    cmd = ""
+                elif cmd == "REM" and (
+                        get_next(chars, c + 1) == " " or
+                        get_next(chars, c + 1) == "\n"):  # if its a note then it just hops ower it
+                    row_tokens[index] = get_token_object("STATIC", "REM")
                     break
-                elif cmd == "FALSE" and (self.getNext(chars, c+1) == " " or self.getNext(chars, c+1) == "\n"):
-                    rowTokens[index] = self.addTokenObjekt("BOOLEAN", "FALSE")
-                    cmd = ""
+                elif cmd == "FALSE" and (get_next(chars, c + 1) == " " or get_next(chars, c + 1) == "\n"):
+                    row_tokens[index] = get_token_object("BOOLEAN", "FALSE")
                     index += 1
-                elif cmd == "TRUE" and (self.getNext(chars, c+1) == " " or self.getNext(chars, c+1) == "\n"):
-                    rowTokens[index] = self.addTokenObjekt("BOOLEAN", "TRUE")
                     cmd = ""
+                elif cmd == "TRUE" and (get_next(chars, c + 1) == " " or get_next(chars, c + 1) == "\n"):
+                    row_tokens[index] = get_token_object("BOOLEAN", "TRUE")
                     index += 1
-
-                    
-                    #check for var
-                elif len(cmd) > 0 and (self.getNext(chars, c+1) == " " or self.getNext(chars, c+1) == "\n" or self.getNext(chars, c+1) == "," or self.getNext(chars, c+1) == "]"):
-                    rowTokens[index] = self.addTokenObjekt("VAR", cmd)
                     cmd = ""
+
+                elif cmd.isalpha() and cmd in self.KEYWORDS_LIST and get_next(chars, c + 1) in [" ", "\n"]:
+                    row_tokens[index] = get_token_object("STATIC", cmd)
                     index += 1
-
-
-                #check for variabels a variabel name can only be one char long
-                #needs a loot of work
-                elif len(cmd) > 0 and (self.getNext(chars, c+1) == "["):
-                    rowTokens[index] = self.addTokenObjekt("VARARRAY", cmd)
                     cmd = ""
+
+                # check for var
+                elif len(cmd) > 0 and get_next(chars, c + 1) in [" ", "\n", ",", "]"]:
+                    row_tokens[index] = get_token_object("VAR", cmd)
                     index += 1
+                    cmd = ""
 
-                #   funktions i need
-                #       COLOR()
-                #       GETCHAR()
-                #       GETCLICK()
-                #       LEN()
-                #       CHR()
-                #       TIME()
-                #       
-                    
+                # check for variables a variable name can only be one char long
+                # needs a lot of work
+                elif len(cmd) > 0 and (get_next(chars, c + 1) == "["):
+                    row_tokens[index] = get_token_object("VARARRAY", cmd)
+                    index += 1
+                    cmd = ""
 
-            Tokens[key] = rowTokens
-        return Tokens
+            tokens[key] = row_tokens
 
-    def addTokenObjekt(self, t, v):
-        tempToken = {}
-        tempToken["type"] = t
-        tempToken["value"] = v
-        return tempToken 
+        print(tokens)
+        return tokens
 
-    def split(self, word): 
-        return [char for char in word]  
-
-
-    def getCommandMap(self):
-        return self.CommandMap 
-
-    def getNext(self, chars, index):
-        #print(len(chars), index)
-        if len(chars) > index:
-            #print("out: " + chars[index])
-            return chars[index]
-        return -1
-
-    def isNumber(self, char):
-        p = re.compile('[0-9]+')
-        if p.match(char):
-            return 1
-        return 0 
-    
-    def isBokstav(self, char):
-        p = re.compile('[a-zA-Z]+')
-        if p.match(char): 
-            return 1
-        return 0
-
-    def isOporation(self, char):
-        p = re.compile('[-+*/=><()]+')
-        if p.match(char):
-            return 1
-        return 0
+    def get_command_map(self):
+        return self.CommandMap
