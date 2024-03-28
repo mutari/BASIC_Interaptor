@@ -15,28 +15,30 @@ def get_next(chars, index):
 class Parser:
     INVISIBLE_CHAR_LIST = [" ", "\t", "\n"]
 
-    KEYWORDS_LIST = ["PRINT", "LET", "GOTO", "ARRAY", "INPUT", "END", "IF", "THEN", "ELSE", "FOR", "TO",
-                     "STEP", "NEXT", "GOSUB", "NAMESPACE", "LOAD", "IMPORT", "AS", "RETURN", "PLOT",
-                     "DISPLAY", "DRAW", "TEXT", "PAUSE", "EXPORT", "CLS", "CLT", "CLC", "REM", "FALSE", "TRUE"]
+    KEYWORDS_LIST = [
+        "PRINT", "LET", "GOTO", "ARRAY", "INPUT", "END", "IF", "THEN", "ELSE", "FOR", "TO",
+        "STEP", "NEXT", "GOSUB", "NAMESPACE", "LOAD", "IMPORT", "AS", "RETURN", "PLOT",
+        "DISPLAY", "DRAW", "TEXT", "PAUSE", "EXPORT", "CLS", "CLT", "CLC", "REM", "FALSE", "TRUE"
+    ]
 
     OPERATORS_DICT = {
-        '=': "OPERATOR", '<': "BOOLEANSKOP", '>': "BOOLEANSKOP", '!=': "BOOLEANSKOP", '+': "OPERATOR",
-        '-': "OPERATOR", '*': "OPERATOR", '/': "OPERATOR", ',': "OPERATOR", '(': "OPERATOR", ')': "OPERATOR",
-        '[': "OPERATOR", ']': "OPERATOR", ';': "OPERATOR"}
+        '=': "NEQ", '+': "PLUS", '-': "MINUS", '*': "MULTIPLIKATION",
+        '/': "SLASH", ',': "COMMA", ';': "APPOSTROF",
+        '(': "LEFTPARENTHESIS", ')': "RIGHTPARENTHESIS", '[': "LEFTBLOCK", ']': "RIGHTBLOCK"
+    }
 
     def __init__(self, mode):
-        self.CommandMap = {}
+        self.command_map = {}
 
     def parse_map(self, cm):
-        self.CommandMap = cm
+        self.command_map = cm
 
         tokens = {}
 
-        for key in self.CommandMap:
+        for key in self.command_map:
             row_tokens = {}
-            # print(": " + self.CommandMap[key])
-            # print("- " + key)
-            chars = split(self.CommandMap[key])
+
+            chars = split(self.command_map[key])
             cmd = ""
             index = 0
 
@@ -50,7 +52,6 @@ class Parser:
 
             for c in it:
                 cmd += chars[c]
-                # print(cmd)
 
                 # if the parser have found a string
                 if is_string:
@@ -89,7 +90,6 @@ class Parser:
                     is_number = True
                     cmd = ""
                     if not chars[c + 1].isdigit():
-                        # print("test")
                         row_tokens[index] = get_token_object("NUM", number)
                         number = ""
                         is_number = False
@@ -120,55 +120,20 @@ class Parser:
                         next(it)
                     index += 1
                     cmd = ""
-                elif cmd == "!=":
-                    row_tokens[index] = get_token_object("BOOLEANSKOP", "NEQ")
-                    index += 1
-                    cmd = ""
-                elif cmd == "+":
-                    row_tokens[index] = get_token_object("OPERATOR", "PLUS")
-                    index += 1
-                    cmd = ""
-                elif cmd == "-":
-                    row_tokens[index] = get_token_object("OPERATOR", "MINUS")
-                    index += 1
-                    cmd = ""
-                elif cmd == "*":
-                    row_tokens[index] = get_token_object("OPERATOR", "MULTIPLIKATION")
-                    index += 1
-                    cmd = ""
-                elif cmd == "/":
-                    row_tokens[index] = get_token_object("OPERATOR", "SLASH")
-                    index += 1
-                    cmd = ""
-                elif cmd == ",":
-                    row_tokens[index] = get_token_object("OPERATOR", "COMMA")
-                    index += 1
-                    cmd = ""
-                elif cmd == "(":
-                    row_tokens[index] = get_token_object("OPERATOR", "LEFTPARENTHESIS")
-                    index += 1
-                    cmd = ""
-                elif cmd == ")":
-                    row_tokens[index] = get_token_object("OPERATOR", "RIGHTPARENTHESIS")
-                    index += 1
-                    cmd = ""
-                elif cmd == "[":
-                    row_tokens[index] = get_token_object("OPERATOR", "LEFTBLOCK")
-                    index += 1
-                    cmd = ""
-                elif cmd == "]":
-                    row_tokens[index] = get_token_object("OPERATOR", "RIGHTBLOCK")
-                    index += 1
-                    cmd = ""
-                elif cmd == ";":
-                    row_tokens[index] = get_token_object("OPERATOR", "APPOSTROF")
+
+                # Check simple operators
+                elif cmd in self.OPERATORS_DICT.keys():
+                    row_tokens[index] = get_token_object("OPERATOR", self.OPERATORS_DICT[cmd])
                     index += 1
                     cmd = ""
 
+                # Check form comments
                 elif cmd == "REM" and get_next(chars, c + 1) in self.INVISIBLE_CHAR_LIST:
                     # if it's a comment then it just skips it
                     row_tokens[index] = get_token_object("STATIC", "REM")
                     break
+
+                # Boolean values
                 elif cmd == "FALSE" and get_next(chars, c + 1) in self.INVISIBLE_CHAR_LIST:
                     row_tokens[index] = get_token_object("BOOLEAN", "FALSE")
                     index += 1
@@ -178,12 +143,13 @@ class Parser:
                     index += 1
                     cmd = ""
 
+                # Check form common keywords
                 elif cmd.isalpha() and cmd in self.KEYWORDS_LIST and get_next(chars, c + 1) in self.INVISIBLE_CHAR_LIST:
                     row_tokens[index] = get_token_object("STATIC", cmd)
                     index += 1
                     cmd = ""
 
-                # check for var
+                # Check for var
                 elif len(cmd) > 0 and get_next(chars, c + 1) in [" ", "\n", ",", "]"]:
                     row_tokens[index] = get_token_object("VAR", cmd)
                     index += 1
@@ -192,14 +158,13 @@ class Parser:
                 # check for variables a variable name can only be one char long
                 # needs a lot of work
                 elif len(cmd) > 0 and (get_next(chars, c + 1) == "["):
-                    row_tokens[index] = get_token_object("VARARRAY", cmd)
+                    row_tokens[index] = get_token_object("VAR_ARRAY", cmd)
                     index += 1
                     cmd = ""
 
             tokens[key] = row_tokens
 
-        print(tokens)
         return tokens
 
     def get_command_map(self):
-        return self.CommandMap
+        return self.command_map

@@ -153,13 +153,6 @@ class FunctionSet:
 
         print(path, importVar)
 
-    def DISPLAY(self, width, height, boolean):
-        width = self.advancedEval(width)
-        height = self.advancedEval(height)
-        boolean = boolean[list(boolean.items())[0][0]]["value"]
-        print(width, height, boolean)
-        display = Display(width, height)
-
     def EXPORT(self, data):
         var = self.getVarByName(data[1]["value"])
         print("exp:" + str(var["name"]) + ":" + str(var["value"]))
@@ -264,7 +257,7 @@ class FunctionSet:
                     out[c] = ({"type": "NUM", "value": value})
                 else:
                     out[c] = ({"type": "STR", "value": value})
-            elif token["type"] == "VARARRAY":
+            elif token["type"] == "VAR_ARRAY":
                 key = self.generateArrayKeys(self.slice(input, c + 1))
                 for j in range(0, key["endOfKeys"]):
                     next(it)

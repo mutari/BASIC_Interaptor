@@ -1,7 +1,7 @@
 import json
 import sys
 from BASICParser import Parser
-from BASICInteraptor import Interaptor
+from BASICInterrupter import Interrupter
 from setManager import SetManager
 from helpFunctions import get_file_input, create_hash_map
 
@@ -38,6 +38,7 @@ if debug == 'true':
 
 parser = Parser(manager_name)
 tokens = parser.parse_map(commandMap)
+#print(json.dumps(tokens))
 
 if debug == 'true':
     print(json.dumps(tokens, indent=2))
@@ -45,14 +46,14 @@ if debug == 'true':
 
 funktionManager = SetManager()
 
-interaptor = Interaptor(funktionManager, manager_name, mode)
+interrupter = Interrupter(funktionManager, manager_name, mode)
 
 f = funktionManager.get_by_name(manager_name)
 
 for i in range(5, len(sys.argv), 2):
     f.createNewVar(sys.argv[i], sys.argv[i + 1])
 
-interaptor.interapt(tokens)
+interrupter.interrupt(tokens)
 
 if debug == 'true':
     print(json.dumps(f.VarList, indent=2))
