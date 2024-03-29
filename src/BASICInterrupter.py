@@ -1,9 +1,7 @@
 from functionSet import FunctionSet
 import traceback
 
-
-def slice(dic, start, end=None):
-    return dict(list(dic.items())[start:end])
+from helpFunctions import token_row_slice
 
 
 def get_index_of(data, val, index="value"):
@@ -98,11 +96,11 @@ class Interrupter:
                             break
                         continue
                     if checking["value"] == "PRINT":
-                        self.functions.PRINT(slice(tokens[code_index], 1))
+                        self.functions.PRINT(token_row_slice(tokens[code_index], 1))
                     elif checking["value"] == "LET":
                         var_name = tokens[code_index][c + 1]
                         if tokens[code_index][c + 2]["value"] == "EQ":
-                            self.functions.LET(var_name, slice(tokens[code_index], 3))
+                            self.functions.LET(var_name, token_row_slice(tokens[code_index], 3))
                         else:
                             print("Let error: " + str(checking) + " row(" + code_index + ")")
                             exit(1)
@@ -113,33 +111,33 @@ class Interrupter:
                             array_dimension = tokens[code_index][c + 3]["value"]
                         self.functions.ARRAY_CREATE(array_name, array_dimension)
                     elif checking["value"] == "INPUT":
-                        data = slice(tokens[code_index], 1)
+                        data = token_row_slice(tokens[code_index], 1)
                         index = get_index_of(data, "APPOSTROF")
-                        text = slice(data, 0, index)
-                        var_name = data[list(slice(data, index + 1).items())[0][0]]
+                        text = token_row_slice(data, 0, index)
+                        var_name = data[list(token_row_slice(data, index + 1).items())[0][0]]
                         self.functions.INPUT(var_name, text)
                     elif checking["value"] == "END":
                         print("The Script Whs Terminated(row: " + code_index + ")")
                         exit(0)
                     elif checking["value"] == "GOTO":
-                        number = self.functions.GOTO(slice(tokens[code_index], 1))
+                        number = self.functions.GOTO(token_row_slice(tokens[code_index], 1))
                         if not self.new:
                             return number
                         code_index = self.move_code_index(tokens, find_row_index_by_key(tokens, number))
                         continue
                     elif checking["value"] == "GOSUB":
-                        number = self.functions.GOSUB(slice(tokens[code_index], 1), code_index)
+                        number = self.functions.GOSUB(token_row_slice(tokens[code_index], 1), code_index)
                         if not self.new:
                             return number
                         code_index = self.move_code_index(tokens, find_row_index_by_key(tokens, number))
                         continue
                     elif checking["value"] == "NAMESPACE":
-                        self.functions.NAMESPACE(slice(tokens[code_index], 1))
+                        self.functions.NAMESPACE(token_row_slice(tokens[code_index], 1))
                     elif checking["value"] == "LOAD":
-                        self.functions.LOAD(slice(tokens[code_index], 1))
+                        self.functions.LOAD(token_row_slice(tokens[code_index], 1))
                     elif checking["value"] == "IMPORT":
-                        path = slice(tokens[code_index], 1, get_index_of(tokens[code_index], "AS"))
-                        import_var = slice(tokens[code_index], get_index_of(tokens[code_index], "AS") + 1)
+                        path = token_row_slice(tokens[code_index], 1, get_index_of(tokens[code_index], "AS"))
+                        import_var = token_row_slice(tokens[code_index], get_index_of(tokens[code_index], "AS") + 1)
                         self.functions.IMPORT(path, import_var)
                         continue
                     elif checking["value"] == "RETURN":
@@ -149,11 +147,11 @@ class Interrupter:
                             code_index = self.move_code_index(tokens, self.rowIndex)
                             continue
                     elif checking["value"] == "PAUSE":
-                        self.functions.PAUSE(slice(tokens[code_index], 1))
+                        self.functions.PAUSE(token_row_slice(tokens[code_index], 1))
                     elif checking["value"] == "IF":
-                        statement = slice(tokens[code_index], 1, get_index_of(tokens[code_index], "THEN"))
-                        code = slice(tokens[code_index], get_index_of(tokens[code_index], "THEN") + 1,
-                                     get_index_of(tokens[code_index], "ELSE"))
+                        statement = token_row_slice(tokens[code_index], 1, get_index_of(tokens[code_index], "THEN"))
+                        code = token_row_slice(tokens[code_index], get_index_of(tokens[code_index], "THEN") + 1,
+                                               get_index_of(tokens[code_index], "ELSE"))
 
                         if self.functions.IF(statement):
                             new_code_index = self.new_interrupter(tokens, code)
@@ -161,18 +159,19 @@ class Interrupter:
                                 code_index = new_code_index
                                 continue
                         elif get_index_of(tokens[code_index], "ELSE") is not None:
-                            alternative_code = slice(tokens[code_index], get_index_of(tokens[code_index], "ELSE") + 1)
+                            alternative_code = token_row_slice(tokens[code_index],
+                                                               get_index_of(tokens[code_index], "ELSE") + 1)
                             new_code_index = self.new_interrupter(tokens, alternative_code)
                             if new_code_index is not None:
                                 code_index = new_code_index
                                 continue
 
                     elif checking["value"] == "EXPORT":
-                        self.functions.EXPORT(slice(tokens[code_index], 1))
+                        self.functions.EXPORT(token_row_slice(tokens[code_index], 1))
                     elif checking["value"] == "FOR":
-                        self.functions.FOR(slice(tokens[code_index], 1), code_index)
+                        self.functions.FOR(token_row_slice(tokens[code_index], 1), code_index)
                     elif checking["value"] == "NEXT":
-                        number = self.functions.NEXT(slice(tokens[code_index], 1))
+                        number = self.functions.NEXT(token_row_slice(tokens[code_index], 1))
                         if number is not None:
                             code_index = self.move_code_index(tokens, find_row_index_by_key(tokens, number))
                             code_index = self.move_code_index(tokens, self.rowIndex)
@@ -183,13 +182,13 @@ class Interrupter:
                 elif checking["type"] == Interrupter.VAR_ARRAY:
                     array_name = checking["value"]
                     # print(tokens[code_index])
-                    keys = slice(tokens[code_index], 1)
+                    keys = token_row_slice(tokens[code_index], 1)
                     # print("keys: " + str(keys))
                     self.functions.ARRAY_UPPDATE(array_name, keys)
                 elif checking["type"] == Interrupter.VAR:
                     if tokens[code_index][c + 1]["value"] == "EQ":
-                        # print(self.slice(tokens[code_index], 3))
-                        self.functions.LET(checking, slice(tokens[code_index], 2))
+                        # print(self.token_row_slice(tokens[code_index], 3))
+                        self.functions.LET(checking, token_row_slice(tokens[code_index], 2))
                     else:
                         print("Error type: " + str(checking) + " row(" + code_index + ")")
                         exit(1)
@@ -205,4 +204,4 @@ class Interrupter:
                     print("An exception occurred: ", str(traceback.print_exc()))
                 else:
                     print(f"""Error: {str(checking)} row({code_index})""")
-                break;
+                break

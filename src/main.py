@@ -5,8 +5,8 @@ from BASICInterrupter import Interrupter
 from setManager import SetManager
 from helpFunctions import get_file_input, create_hash_map
 
-commandList = []
-commandMap = {}
+command_list = []
+command_map = {}
 
 # python3 main.py {bas file} {set name} {mode (dev|pro)} {var1 name} {värde1} {var2 name} {värde2}
 
@@ -30,28 +30,28 @@ if len(sys.argv) > 4:
 else:
     debug = "false"
 
-commandList = get_file_input(script)
+command_list = get_file_input(script)
 
-commandMap = create_hash_map(commandList)
+command_map = create_hash_map(command_list)
 if debug == 'true':
-    print(commandMap)
+    print(command_map)
 
 parser = Parser(manager_name)
-tokens = parser.parse_map(commandMap)
+tokens = parser.parse_map(command_map)
 #print(json.dumps(tokens))
 
 if debug == 'true':
     print(json.dumps(tokens, indent=2))
     print(parser.get_command_map())
 
-funktionManager = SetManager()
+funktion_manager = SetManager()
 
-interrupter = Interrupter(funktionManager, manager_name, mode)
+interrupter = Interrupter(funktion_manager, manager_name, mode)
 
-f = funktionManager.get_by_name(manager_name)
+f = funktion_manager.get_by_name(manager_name)
 
 for i in range(5, len(sys.argv), 2):
-    f.createNewVar(sys.argv[i], sys.argv[i + 1])
+    f.create_new_var(sys.argv[i], sys.argv[i + 1])
 
 interrupter.interrupt(tokens)
 

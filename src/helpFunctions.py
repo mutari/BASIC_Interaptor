@@ -1,9 +1,9 @@
 def get_file_input(name):
-    cmList = []
+    command_list = []
     f = open(name, "r")
     for x in f:
-        cmList.append(x + " ")
-    return cmList
+        command_list.append(x + " ")
+    return command_list
 
 
 def create_hash_map(cm_list):
@@ -16,3 +16,7 @@ def create_hash_map(cm_list):
             continue
         cm_map[number] = " ".join(split)
     return cm_map
+
+
+def token_row_slice(dic, start, end=None):
+    return dict(list(dic.items())[start:end])
